@@ -8,7 +8,7 @@ It is pretty self-explanatory:
              0   = unoccupied with probability 1
              0.5 = occupied with probability 0.5
 The function in bee-map.c should make reading the map pretty easy.
-
+Each pixel in the map represents 10cm, making the entire size of the map be 80m x 80m
 
 LOG DATA FILE FORMAT:
 
