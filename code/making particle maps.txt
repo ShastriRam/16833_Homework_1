@@ -1,0 +1,19 @@
+Jack's Notes:
+
+
+
+
+At startup, process the map so that we are left with just edge pixels of the traversable region.
+There are about 4000 edge pixels for this map.  
+
+
+When making a range map for a particle:
+	* Adjust the particle's position +25cm in the look direction
+	* Eliminate all edges that are greater than desired range away in X & Y   (only use edges within a square 2x range around the edge pixel)
+	* Find angle and distance to each remaining edge pixel.
+	* Remove edge pixels less than -95 and greater than 95 degrees from the look direction.  
+	* For each range measurement:
+		- Extract all pixels within 10 degrees of the beam direction.
+		- Rotate the pixels so that they are centered around 0 degrees
+		- For each remaining edge, find the Y coordinate
+		- Use the closest edge that is within 5cm of 0.
