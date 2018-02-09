@@ -102,7 +102,6 @@ class MapReader:
                                                                     # rows with [X Y] that correspond
                                                                     # to the locations of the edge pixels 
                                                                     # in our case, this is (5643, 2)
-        self.edgeLocations = self.edgeLocations.astype(float)
 
 
 

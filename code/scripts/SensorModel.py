@@ -3,6 +3,8 @@ import math
 import time
 from matplotlib import pyplot as plt
 from scipy.stats import norm
+from scipy.stats import expon
+from scipy import signal
 import pdb
 
 from MapReader import MapReader
@@ -46,24 +48,23 @@ class SensorModel:
 
         self.numSamples = 1000 # This should be 1000 since our max range is 10m and the divisions are in 10cm units.
 
-        x = np.linspace(expon.ppf(0.01), expon.ppf(0.99), numSamples) # Makes numSamples samples with a probability ranging from .99 to .1
+        x = np.linspace(expon.ppf(0.01), expon.ppf(0.99), self.numSamples) # Makes numSamples samples with a probability ranging from .99 to .1
         self.expPDF = expon.pdf(x)
-        self.expPDF *= exponentialScaleFactor # Scale it down so that 
+        self.expPDF *= self.exponentialScaleFactor # Scale it down so that 
 
         # Make the gaussian distribution
-        self.gaussPDF = gauss(self.numSamples * 2,stdev,True) 
+        self.gaussPDF = signal.gaussian(self.numSamples * 2,std=self.stdev) # We want this to be 2000 samples wide
 
 
         # Resize the distributions to give them a second row.
         self.expPDF.resize(2,self.numSamples)
         self.gaussPDF.resize(2,self.numSamples*2)
 
-
         # Find the sums at each point in the two PDFs
-        for I in range(numSamples):
+        for I in range(self.numSamples):
             self.expPDF[1][I] = self.expPDF[0][0:I+1].sum()
 
-        for I in range(numSamples*2):
+        for I in range(self.numSamples*2):
             self.gaussPDF[1][I] = self.gaussPDF[0][0:I+1].sum()
 
         self.uniformSum = self.uniformValue * self.numSamples
@@ -72,7 +73,7 @@ class SensorModel:
 
 
 
-    def findMeasurement(globalAngleForBeam, remainingEdgesVectorForm)
+    def findMeasurement(self,globalAngleForBeam, remainingEdgesVectorForm, particleAngle):
         # Given the direction that a distance is desired for and the remaining edges in [angle distance]
         # form, returns the distance to the closest edge
 
@@ -109,10 +110,10 @@ class SensorModel:
 
         # Rotate the edges so that they are centered around 0 degrees
         edgesLeft[:,0] = edgesLeft[:,0] - globalAngleForBeam
+        print edgesLeft
 
         # Find the Y coordinate for all of the 'edgesLeft' - store it where angle is currently 
-        edgesLeft[:,0] = edgesLeft[:,1] * math.sin(edgesLeft[:,0])
-
+        edgesLeft[:,0] = edgesLeft[:,1] * math.sin([edgesLeft[:,0]])
 
         # Find the closest one where abs(Y) is less than 5cm if there is one
         distance = 1000   # This is the max distance
@@ -149,8 +150,8 @@ class SensorModel:
         particleY = x_t1[1]
         particleAngle = x_t1[2] 
 
-        particleX += 25 * cos(particleAngle)
-        particleY += 25 * sin(particleAngle)
+        particleX += 25 * math.cos(particleAngle)
+        particleY += 25 * math.sin(particleAngle)
 
 
         # Eliminate edges that are outside of a bounding box that surrounds the particle
@@ -166,12 +167,12 @@ class SensorModel:
 
 
         # Convert what's left to polar form.
-        remainingEdgesVectorForm = zeros(remainingEdges.shape[0],2)
+        remainingEdgesVectorForm = np.zeros([remainingEdges.shape[0],2])
         index = 0
         for row in remainingEdges:
             angle = math.atan2(row[1],row[0])
             distance = math.sqrt(row[0]*row[0] + row[1]*row[1])
-            remainingEdgesVectorForm[index,:] = np.array[angle, distance]       # RemainingEdgesVectorForm is [angle distance]
+            remainingEdgesVectorForm[index,:] = np.array([angle, distance])       # RemainingEdgesVectorForm is [angle distance]
             index += 1
 
         # Get rid of all edges that are >95 degrees of the particle's direction to further reduce the 
@@ -221,11 +222,11 @@ class SensorModel:
 
 
             # calculate the particle's measurement for this angle 
-            particleMeasurement = self.findMeasurement(absoluteAngle, remainingEdgesVectorForm)
+            particleMeasurement = self.findMeasurement(absoluteAngle,remainingEdgesVectorForm, particleAngle)
 
             # ######################### FOR TESTING ONLY ############################
-            X = particleMeasurement * cos(absoluteAngle) + particleX
-            Y = particleMeasurement * sin(absoluteAngle) + particleY
+            X = particleMeasurement * math.cos(absoluteAngle) + particleX
+            Y = particleMeasurement * math.sin(absoluteAngle) + particleY
 
             self.rangeLines[I][:] = [particleX,particleY,X,Y]
             # ######################### FOR TESTING ONLY ############################
