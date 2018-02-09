@@ -130,10 +130,8 @@ class SensorModel:
         for the particle.  
         param[in] z_t1_arr : actual laser range readings [array of 180 values] at time t
         param[in] x_t1 : particle state belief [x, y, theta] at time t [world_frame]
-        param[out] prob_zt1 : likelihood of a range scan zt1 at time t
+        param[out] prob_zt1 : likelihood of a range scan zt1 at time t  (log probability)
         """
-        actualMeasurement = 206 # cm
-        particleMeasurement = 193 
 
         ############################## KNOBS TO TURN #########################################
 
@@ -168,10 +166,11 @@ class SensorModel:
         # Convert what's left to polar form.
         remainingEdgesVectorForm = zeros(remainingEdges.shape[0],2)
         index = 0
-        for row in remainingEdgesVectors:
+        for row in remainingEdges:
             angle = math.atan2(row[1],row[0])
             distance = math.sqrt(row[0]*row[0] + row[1]*row[1])
             remainingEdgesVectorForm[index,:] = np.array[angle, distance]       # RemainingEdgesVectorForm is [angle distance]
+            index += 1
 
         # Get rid of all edges that are >95 degrees of the particle's direction to further reduce the 
         # amount of data being worked with. 
@@ -214,18 +213,18 @@ class SensorModel:
                                   # 16 gives me beams at [0, 16, 32, 48, 64, 80, 96, 112, 128, 144, 160, 176]
 
             # Calculate the angle for this reading
-            relativeAngle = (I/180)* math.point
-            absoluteAngle = relativeAngle + particleAngle
+            relativeAngle = (float(I)/180)* math.pi
+            absoluteAngle = relativeAngle + particleAngle - math.pi/2
 
 
 
-            # alculate the particle's measurement for this angle 
-            particleMeasurement = findMeasurement(absoluteAngle, remainingEdgesVectorForm)
+            # calculate the particle's measurement for this angle 
+            particleMeasurement = self.findMeasurement(absoluteAngle, remainingEdgesVectorForm)
 
 
             # Adjust the measurements into 10cm divisions ie: Convert them into their bin locations
-            actualMeasurement = round(actualMeasurements[I]/10)
-            particleMeasurement = round(particleMeasurement/10)
+            actualMeasurement = round(float(actualMeasurements[I])/10)
+            particleMeasurement = round(particleMeasurement/10)   #  Is this a float?   ################################################
 
             # Calculate the probability for this reading.  
             probability = uniformValue;
