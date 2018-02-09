@@ -66,7 +66,9 @@ class SensorModel:
         for I in range(numSamples*2):
             self.gaussPDF[1][I] = self.gaussPDF[0][0:I+1].sum()
 
-        self.uniformSum = self.uniformValue * self.numSamples;
+        self.uniformSum = self.uniformValue * self.numSamples
+
+        self.rangeLines = np.zeros((180,4))
 
 
 
@@ -206,7 +208,7 @@ class SensorModel:
 
         cumulativeProbability = 0
 
-        for I in range(0,180,35): # calculate a range for all 180 measurements.  To reduce the number 
+        for I in range(0,180,1): # calculate a range for all 180 measurements.  To reduce the number 
                                   # of distances calculated, make the last number something other than 1
                                   # 35 gives me beams at [0, 35, 70, 105, 140, 175]
                                   # 25 gives me beams at [0, 25, 50, 75, 100, 125, 150, 175]
@@ -220,6 +222,14 @@ class SensorModel:
 
             # calculate the particle's measurement for this angle 
             particleMeasurement = self.findMeasurement(absoluteAngle, remainingEdgesVectorForm)
+
+            # ######################### FOR TESTING ONLY ############################
+            X = particleMeasurement * cos(absoluteAngle) + particleX
+            Y = particleMeasurement * sin(absoluteAngle) + particleY
+
+            self.rangeLines[I][:] = [particleX,particleY,X,Y]
+            # ######################### FOR TESTING ONLY ############################
+
 
 
             # Adjust the measurements into 10cm divisions ie: Convert them into their bin locations
