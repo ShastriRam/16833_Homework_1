@@ -8,15 +8,32 @@ from SensorModel import SensorModel
 from Resampling import Resampling
 
 from matplotlib import pyplot as plt
+from matplotlib.patches import Circle
 from matplotlib import figure as fig
 import time
+from time import sleep
 
-def visualize_map(occupancy_map):
-    fig = plt.figure()
+def visualize_map(occupancy_map,particles):
+    fig,ax = plt.subplots(1)
+    ax.set_aspect('equal')
     # plt.switch_backend('TkAgg')
     mng = plt.get_current_fig_manager();  # mng.resize(*mng.window.maxsize())
-    plt.ion(); plt.imshow(occupancy_map, cmap='Greys'); plt.axis([0, 800, 0, 800]);
+    plt.ion(); ax.imshow(occupancy_map, cmap='Greys'); ax.axis([0, 800, 0, 800]);
+    x = particles[:,0] 
+    y = particles[:,1]
+    x = np.mean(x);
+    y = np.mean(y);
+  
+    # Now, loop through coord arrays, and create a circle at each x,y pair
+    #for xx,yy in zip(x,y):
+    #	circ = Circle((xx,yy),0.5)
+    #	ax.add_patch(circ)
 
+    circ = Circle((x,y),5)
+    ax.add_patch(circ)
+    plt.show()
+    sleep(3)
+    
 
 def visualize_timestep(X_bar, tstep):
     x_locs = X_bar[:,0]/10.0
@@ -71,7 +88,10 @@ def main():
     src_path_log = '../data/log/robotdata1.log'
 
     map_obj = MapReader(src_path_map)
-    occupancy_map = map_obj.get_map() 
+    occupancy_map = map_obj.get_map()
+    map_size_x = map_obj.get_map_size_x()
+    map_size_y = map_obj.get_map_size_y()
+
     logfile = open(src_path_log, 'r')
 
     motion_model = MotionModel()
@@ -80,14 +100,12 @@ def main():
 
     num_particles = 500
     X_bar = init_particles_random(num_particles, occupancy_map)
-
+       
     vis_flag = 1
 
     """
     Monte Carlo Localization Algorithm : Main Loop
     """
-    if vis_flag:
-        visualize_map(occupancy_map)
 
     first_time_idx = True
     for time_idx, line in enumerate(logfile):
@@ -137,6 +155,8 @@ def main():
         X_bar = X_bar_new
         u_t0 = u_t1
 
+        if vis_flag:
+            visualize_map(occupancy_map,X_bar)
         """
         RESAMPLING
         """
