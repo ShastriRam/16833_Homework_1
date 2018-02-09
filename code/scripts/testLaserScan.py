@@ -20,8 +20,8 @@ def visualize_map(occupancy_map,vectorLaser):
     x2 = vectorLaser[:,3] 
     y2 = vectorLaser[:,4]
 
-    for xx1,yy1,xx2,yy2 in rang(0, len(x1)):
-        plt.plot([xx1, xx2], [yy1, yy2], color='k', linestyle='-', linewidth=1)
+    for i in rang(0, len(x1)):
+        plt.plot([x1[i],x2[i]],[y1[i], y2[i]], color='k', linestyle='-', linewidth=1)
     plt.show()
     #sleep(3)
 
