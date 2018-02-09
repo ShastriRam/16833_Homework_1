@@ -207,9 +207,11 @@ class SensorModel:
 
         cumulativeProbability = 0
 
-        for I in range(0,180,1): # calculate a range for all 180 measurements.  To reduce the number 
-                                 # of distances calculated, make the last number something other than 1
-            
+        for I in range(0,180,35): # calculate a range for all 180 measurements.  To reduce the number 
+                                  # of distances calculated, make the last number something other than 1
+                                  # 35 gives me beams at [0, 35, 70, 105, 140, 175]
+                                  # 25 gives me beams at [0, 25, 50, 75, 100, 125, 150, 175]
+                                  # 16 gives me beams at [0, 16, 32, 48, 64, 80, 96, 112, 128, 144, 160, 176]
 
             # Calculate the angle for this reading
             relativeAngle = (I/180)* math.point
