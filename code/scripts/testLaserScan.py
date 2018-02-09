@@ -35,8 +35,10 @@ def main():
     src_path_map = '../data/map/wean.dat'
     map_obj = MapReader(src_path_map)
     occupancy_map = map_obj.get_map()
-    sensorObject = SensorModel(occupancy_map)
-    vectorLaser = SensorObject.beam_range_finder_model(z, x)
+    map_obj.makeEdgeList()
+    edgelist = map_obj.edgeLocations
+    sensorObject = SensorModel(edgelist)
+    vectorLaser = sensorObject.beam_range_finder_model(z, x)
     visualize_map(occupancy_map,vectorLaser)
 
 if __name__=="__main__":
