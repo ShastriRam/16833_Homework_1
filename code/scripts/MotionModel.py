@@ -12,10 +12,10 @@ class MotionModel:
     def __init__(self):
 
         #Initialize Motion Model parameters here
-        alpha_1 = 0.5;
-        alpha_2 = 0.5;
-        alpha_3 = 0.5;
-        alpha_4 = 0.5; 
+        self.alpha_1 = 0.0001;
+        self.alpha_2 = 0.0001;
+        self.alpha_3 = 0.0001;
+        self.alpha_4 = 0.0001; 
 
     def sample_normal(self, b_sq):
         b = math.sqrt(b_sq);
@@ -38,32 +38,33 @@ class MotionModel:
         param[out] x_t1 : particle state belief [x, y, theta] at time t [world_frame]
         """
 
-        x_t0 = u_t0[0];
-        y_t0 = u_t0[1];
-        theta_t0 = u_t0[2];
+        x_odom_0 = u_t0[0];
+        y_odom_0 = u_t0[1];
+        theta_odom_0 = u_t0[2];
 
-        x_t1 = u_t1[0];
-        y_t1 = u_t1[1];
-        theta_t1 = u_t1[2];
-
+        x_odom_1 = u_t1[0];
+        y_odom_1 = u_t1[1];
+        theta_odom_1 = u_t1[2];
+                
         pose_x = x_t0[0];
         pose_y = x_t0[1];
         pose_theta = x_t0[2]; 
 
-        delta_rot_1 = math.atan2(y_t1-y_t0, x_t1-x_t0) - theta_t0;
-        delta_trans = math.sqrt( (x_t0-x_t1)*(x_t0-x_t1) + (y_t0-y_t1)*(y_t0-y_t1));
-        delta_rot_2 = theta_t1 - theta_t0 - delta_rot_1;
+        delta_rot_1 = math.atan2(y_odom_1-y_odom_0, x_odom_1-x_odom_0 - theta_odom_0);
+        delta_trans = math.sqrt( (x_odom_0-x_odom_1)*(x_odom_0-x_odom_1) +
+                                 (y_odom_0-y_odom_1)*(y_odom_0-y_odom_1));
+        delta_rot_2 = theta_odom_1 - theta_odom_0 - delta_rot_1;
 
-        delta_rot_1_prime = delta_rot_1 - sample(alpha_1*pow(delta_rot_1,2) +
-                                                 alpha_2*pow(delta_trans,2));
-        delta_trans_prime = delta_trans - sample(alpha_3*pow(delta_trans,2) +
-                                                 alpha_4*pow(delta_rot_1,2) +
-                                                 alpha_4*pow(delta_rot_2,2));
-        delta_rot_2_prime = delta_rot_2 - sample(alpha_1*pow(delta_rot_2,2) +
-                                                 alpha_2*pow(delta_trans,2));
+        delta_rot_1_prime = delta_rot_1 - self.sample_normal(self.alpha_1*pow(delta_rot_1,2) +
+                                                             self.alpha_2*pow(delta_trans,2));
+        delta_trans_prime = delta_trans - self.sample_normal(self.alpha_3*pow(delta_trans,2) +
+                                                             self.alpha_4*pow(delta_rot_1,2) +
+                                                             self.alpha_4*pow(delta_rot_2,2));
+        delta_rot_2_prime = delta_rot_2 - self.sample_normal(self.alpha_1*pow(delta_rot_2,2) +
+                                                             self.alpha_2*pow(delta_trans,2));
 
-        x_prime = pose_x + delta_trans_prime*cos(pose_theta+delta_rot_1_prime);
-        y_prime = pose_y + delta_trans_prime*sin(pose_theta+delta_rot_1_prime);
+        x_prime = pose_x + delta_trans_prime*math.cos(pose_theta+delta_rot_1_prime);
+        y_prime = pose_y + delta_trans_prime*math.sin(pose_theta+delta_rot_1_prime);
         theta_prime = pose_theta + delta_rot_1_prime + delta_rot_2_prime;
 
         x_t1 = np.array([x_prime, y_prime, theta_prime]);  
