@@ -1,0 +1,86 @@
+
+The probability curve looks something like this:  (I'm not using the step function at the end)
+
+|                                                                                                        
+|                                                       XX                                              
+|                                                      X X                                            
+|                                                     X   XX                                             
+|                                                     X     X                                            
+|                                                    X      X                                            
+|                                                    X      X                                            
+|                                                    X      X                                            
+|                                                    X      X                                            
+|                                                   X       X                                            
+XX                                                  X        X                                            
+|XXX                                               X         X                                    
+|  XXXXX                                           X         X                                      
+|      XXXXX                                      X           X                                     
+|          XXXXX                                 X             X                                    
+|               XXXXXX                          X               X                                 
+|                     XXXXXXXXXX               X                  XXXXXX                          
+|                              XXXXXXXXXXXXXXXX                         XXXXXXXXXXXXXXXXXXXXX   
+|                                                                                            XXXXXXX   
+|                                                                                                       
++---------------------------------------------------------------------------------------------------
+
+It consists of an exponential, a gaussian, and a delta function
+
+The mean of the gaussian is at the distance that our simulated lidar beam ends at.
+ 
+The probability for the particle is found by finding the probability at the distance of the actual lidar 
+measurement.  
+
+To make things fast, the exponential function should be precomputed as a lookup table
+The gaussian should also be precomputed but with twice the width of the ranges.  
+The gaussian should have things in the form   [pr(x),  sum of this and all previous probabilities]
+The exponential function should be calculated the same way.
+I'm not going to use the delta function because I am not seeing it in the data.
+The uniform distribution should have [pr(x), pr(x) * 1000]
+
+
+TODO:  scale the exponential distribution
+
+To get a sample (A)
+* Lookup the exponential probability if the actual measurement is less than the particle's measurement
+* Lookup the gaussian probability @ sample location and add to previous value
+* Add in the uniform probability
+
+Now find the sum of the whole PDF (B)
+* Lookup the exponential sum at the particle's measurement
+* Find the sum of the gaussian by subtracting the sum from the sample just to the left of the PDF from the last used sample's sum
+* Add the previous two values from the uniform distributions sum.
+
+Divide A/B to get the probability
+Take the log of that value 
+
+
+
+
+
+
+
+from scipy.stats import expon
+import scipy.signal.gaussian as gauss
+numSamples = 1000
+stdev = 1	# Adjusts the width of the gaussian
+
+
+
+
+# Make the exponential distribution
+x = np.linspace(expon.ppf(0.01), expon.ppf(0.99), numSamples) # Makes numSamples samples with a probability ranging from .99 to .1
+expPDF = expon.pdf(x);
+
+# Make the gaussian distribution
+gaussPDF = gauss(numSamples * 2,stdev,True) 
+
+
+
+# Find the sums at each point in the two PDFs
+for I in range 1:1000
+	A[0:2].sum()
+
+
+
+
+

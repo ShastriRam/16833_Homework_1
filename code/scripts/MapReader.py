@@ -73,6 +73,9 @@ class MapReader:
     def get_map(self):
         return self._occupancy_map
 
+    def get_edgeLocations(self):
+        return self.edgeLocations
+
     def get_map_size_x(self): # in cm
         return self._size_x
 
@@ -95,7 +98,7 @@ class MapReader:
 
         temp = np.concatenate((x,y))
         length = temp.shape[0]
-        edgeLocations = np.fliplr(np.reshape(temp,(2,length/2)).T)  # This will be a matrix that has 
+        self.edgeLocations = np.fliplr(np.reshape(temp,(2,length/2)).T)  # This will be a matrix that has 
                                                                     # rows with [X Y] that correspond
                                                                     # to the locations of the edge pixels 
                                                                     # in our case, this is (5643, 2)
