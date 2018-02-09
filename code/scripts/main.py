@@ -13,21 +13,26 @@ from matplotlib import figure as fig
 import time
 from time import sleep
 
-def visualize_map(occupancy_map, x_size, y_size, particles):
+def visualize_map(occupancy_map,particles):
     fig,ax = plt.subplots(1)
     ax.set_aspect('equal')
     # plt.switch_backend('TkAgg')
     mng = plt.get_current_fig_manager();  # mng.resize(*mng.window.maxsize())
     plt.ion(); ax.imshow(occupancy_map, cmap='Greys'); ax.axis([0, 800, 0, 800]);
-    x = particles[:,0] / 8 
-    y = particles[:,1] / 8
+    x = particles[:,0] 
+    y = particles[:,1]
+    x = np.mean(x);
+    y = np.mean(y);
   
     # Now, loop through coord arrays, and create a circle at each x,y pair
-    for xx,yy in zip(x,y):
-    	circ = Circle((xx,yy),0.5)
-    	ax.add_patch(circ)
+    #for xx,yy in zip(x,y):
+    #	circ = Circle((xx,yy),0.5)
+    #	ax.add_patch(circ)
+
+    circ = Circle((x,y),5)
+    ax.add_patch(circ)
     plt.show()
-    sleep(10)
+    sleep(3)
     
 
 def visualize_timestep(X_bar, tstep):
@@ -101,8 +106,6 @@ def main():
     """
     Monte Carlo Localization Algorithm : Main Loop
     """
-    if vis_flag:
-        visualize_map(occupancy_map, map_size_x, map_size_y, X_bar)
 
     first_time_idx = True
     for time_idx, line in enumerate(logfile):
@@ -152,6 +155,8 @@ def main():
         X_bar = X_bar_new
         u_t0 = u_t1
 
+        if vis_flag:
+            visualize_map(occupancy_map,X_bar)
         """
         RESAMPLING
         """
