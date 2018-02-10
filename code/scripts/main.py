@@ -24,30 +24,32 @@ def visualize_map(occupancy_map,particles):
     #x = np.mean(x);
     #y = np.mean(y);
     plt.imshow(occupancy_map, cmap='Greys');
-    plt.scatter(x,y); 
-    plt.show(block=False)
-    time.sleep(3)
+    plt.scatter(x,y,color='r'); 
+    #plt.show(block=False)
+    plt.show()
+    time.sleep(1)
     plt.close()
 
-def visualize_map(occupancy_map,particles, i):
+# def visualize_map(occupancy_map,particles, i):
     
-    plt.figure(1); 
-    x = particles[:,0]/10 
-    y = particles[:,1]/10
-    #for xx,yy in zip(x,y):
-    #	circ = Circle((xx,yy),0.5)
-    #	ax.add_patch(circ)
+#     plt.figure(1); 
+#     x = particles[:,0]/10 
+#     y = particles[:,1]/10
+#     #for xx,yy in zip(x,y):
+#     #	circ = Circle((xx,yy),0.5)
+#     #	ax.add_patch(circ)
 
 
-    #circ = Circle((x,y),5)
-    #ax.add_patch(circ)
-    #plt.show()
-    #sleep(3)
-    plt.imshow(occupancy_map, cmap='Greys'); 
-    plt.scatter(x,y); 
-    plt.show(block=False)
-    time.sleep(3)
-    plt.close()
+#     #circ = Circle((x,y),5)
+#     #ax.add_patch(circ)
+#     #plt.show()
+#     #sleep(3)
+#     plt.imshow(occupancy_map, cmap='Greys'); 
+#     plt.scatter(x,y); 
+#     #plt.show(block=False)
+#     plt.show
+#     time.sleep(3)
+#     plt.close()
 
     
 
@@ -148,7 +150,7 @@ def main():
     sensor_model = SensorModel(occupancy_map)
     resampler = Resampling()
 
-    num_particles = 500
+    num_particles = 10
     #X_bar = init_particles_random(num_particles, occupancy_map)
     X_bar = init_particles_freespace(num_particles, occupancy_map)
 
@@ -158,7 +160,6 @@ def main():
     """
     Monte Carlo Localization Algorithm : Main Loop
     """
-    i = 1
     first_time_idx = True
     for time_idx, line in enumerate(logfile):
         # time_idx is just a counter
@@ -178,7 +179,8 @@ def main():
         if (meas_type == "L"):  # Laser data
              odometry_laser = meas_vals[3:6] # [x, y, theta] coordinates of laser in odometry frame
              ranges = meas_vals[6:-1] # 180 range measurement values from single laser scan
-        
+        else: 
+            continue    # skipping Odometry reading
         print "Processing time step " + str(time_idx) + " at time " + str(time_stamp) + "s"
 
         if (first_time_idx):
@@ -211,16 +213,17 @@ def main():
         u_t0 = u_t1
 
         if vis_flag:
-            visualize_map(occupancy_map,X_bar,i)
-            i = i + 1
+            visualize_map(occupancy_map,X_bar)
         """
         RESAMPLING
         """
+        print(X_bar)
         X_bar = resampler.low_variance_sampler(X_bar,num_particles)
 
 
-        if vis_flag:
-            visualize_timestep(X_bar, time_idx)
+
+        # if vis_flag:
+        #     visualize_timestep(X_bar, time_idx)
 
 if __name__=="__main__":
     main()

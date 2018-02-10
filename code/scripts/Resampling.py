@@ -34,30 +34,31 @@ class Resampling:
         return X_bar_resampled
 
 
-    def low_variance_sampler(self, X_bar, M):
+    def low_variance_sampler(self, particles, numberOfParticles):
 
         """
-        X_bar : [num_particles x 4] sized array containing [x, y, theta, wt] values for all particles
-        X_bar_resampled : [num_particles x 4] sized array containing [x, y, theta, wt] values for resampled set of particles
+        particles : [num_particles x 4] sized array containing [x, y, theta, wt] values for all particles
+        particles_resampled : [num_particles x 4] sized array containing [x, y, theta, wt] values for resampled set of particles
         M is the number of particles
         """
 
-        X_bar_resampled = []
-        r = np.random.uniform(0,(1/float(M))) # gives a number that is between 0 and 1/M, which is the width between the even samples
-        c = X_bar[0,3] # The weight for the first particle
+        resampledParticles = []
+        weightOffset = np.random.uniform(0,(1/float(numberOfParticles))) # gives a number that is between 0 and 1/M, which is the width between the even samples
+        cumulativeWeight = particles[0,3] # The weight for the first particle
         #print(c)
-        i = 1
-        for m in range(1,M+1):
-            U = r + (m - 1) * (1/M)  # U is position where it samples from
-            # Add the weights of the particles until they are greater than U
-            while U > c :
-                i = i + 1
-                c = c + X_bar[i,3]
-            X_bar_resampled.append(X_bar[i])
-        X_bar_resampled = np.asarray(X_bar_resampled)
+        particleIndex = 0   
+        for m in range(1,numberOfParticles+1): # m
+            sampleLocation = weightOffset + (m - 1) * (1/float(numberOfParticles))  
+            # Add the weights of the particles until they are greater than sampleLocation
+            while ((sampleLocation > cumulativeWeight) & (particleIndex < numberOfParticles-1)):   
+                particleIndex = particleIndex + 1
+                cumulativeWeight = cumulativeWeight + particles[particleIndex,3]
+            print (particleIndex)
+            resampledParticles.append(particles[particleIndex])
+        resampledParticles = np.asarray(resampledParticles)
        
 
-        return X_bar_resampled
+        return resampledParticles
 
 if __name__ == "__main__":
     pass

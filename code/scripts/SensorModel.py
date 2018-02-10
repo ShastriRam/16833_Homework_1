@@ -109,6 +109,9 @@ class SensorModel:
                 xStep = -1
             #print(range(particleLocationX,particleLocationX+xSteps,xStep))
             for X in range(particleLocationX,particleLocationX+xSteps,xStep):   # This fails if the second one is less than the first
+                # Check to see if the pixel is out of range
+                if X < 0 | X > 799 | Y < 0 | Y > 799:
+                    break
                 if self.occupancyMap[Y,X] == 0:
                     # Here's our range!
                     # Calculate the distance
@@ -133,6 +136,9 @@ class SensorModel:
             #print(range(particleLocationY,particleLocationY+ySteps,yStep))
             for Y in range(particleLocationY,particleLocationY+ySteps,yStep):
                 # Check the current location 
+                # Check to see if the pixel is out of range
+                if X < 0 | X > 799 | Y < 0 | Y > 799:
+                    break
                 if self.occupancyMap[Y,X] == 0:
                     # Here's our range!
                     # Calculate the distance
@@ -178,10 +184,10 @@ class SensorModel:
         particleY = particleState[1]
         particleAngle = particleState[2] 
 
-        print('Sensor Model: particleX: ')
-        print(particleX)
-        print('Sensor Model: particleY: ')
-        print(particleY)
+        # print('Sensor Model: particleX: ')
+        # print(particleX)
+        # print('Sensor Model: particleY: ')
+        # print(particleY)
 
 
         particleX += 25 * math.cos(particleAngle)
@@ -245,8 +251,8 @@ class SensorModel:
 
             # Figure out the shift of the gaussian.
             # As is, the center is at sample numSamples 
-            firstGaussianSample = self.numSamples - particleMeasurement
-            lastGaussianSample = firstGaussianSample + self.numSamples
+            firstGaussianSample = self.numSamples-1 - particleMeasurement
+            lastGaussianSample = firstGaussianSample + self.numSamples-1
 
             probability += self.gaussPDF[0][int(firstGaussianSample) + int(actualMeasurement)]
 
