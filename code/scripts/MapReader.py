@@ -84,14 +84,12 @@ class MapReader:
 
     def makeEdgeList(self):
         # takes the edges array and makes a list of all of the coordinates for all pixels that equal 1
-        # edgeMapWidth = self.edges.shape[1]
-        # edgeMapHeight = self.edges.shape[0]
+        # Coordinates are given in cm increments
 
         # Sum all of the pixels in the map.  This gives me a count of all of the edge pixels.
         # values, counts = np.unique(self.edges, return_counts=True)
         # numberOfEdgePixels = counts[1]
         # print('Number of edge pixels: ', numberOfEdgePixels)
-        # edgeLocations = np.zeros(numberOfEdgePixels,2)
 
 
         x,y = np.nonzero(self.edges)
@@ -102,7 +100,11 @@ class MapReader:
                                                                     # rows with [X Y] that correspond
                                                                     # to the locations of the edge pixels 
                                                                     # in our case, this is (5643, 2)
+<<<<<<< HEAD
+        self.edgeLocations *= 10 # because the map is in 10 cm increments.  
+=======
         self.edgeLocations = self.edgeLocations.astype(float)
+>>>>>>> 5b965def0af1f1f7c820cda5cb74afe4fbb4fe3e
 
 
 
