@@ -13,7 +13,7 @@ class Resampling:
         TODO : Initialize resampling process parameters here
         """
 
-    def multinomial_sampler(self, X_bar):
+    def multinomial_sampler(self, X_bar, M):
 
         """
         param[in] X_bar : [num_particles x 4] sized array containing [x, y, theta, wt] values for all particles
@@ -32,7 +32,7 @@ class Resampling:
 
         return X_bar_resampled
 
-    def low_variance_sampler(self, X_bar):
+    def low_variance_sampler(self, X_bar, M):
 
         """
         param[in] X_bar : [num_particles x 4] sized array containing [x, y, theta, wt] values for all particles
@@ -43,12 +43,11 @@ class Resampling:
         TODO : Add your code here
         """
         X_bar_resampled = []
-        M = 500
         r = np.random.uniform(0,(1/M))
         c = X_bar[0,3]
         print(c)
         i = 1
-        for m in range(1, M):
+        for m in range(0, M):
             U = r + (m - 1) * (1/M)
             while U > c :
                 i = i + 1

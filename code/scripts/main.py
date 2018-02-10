@@ -23,12 +23,23 @@ def visualize_map(occupancy_map,particles, i):
     x = particles[:,0]/10 
     y = particles[:,1]/10
     # Now, loop through coord arrays, and create a circle at each x,y pair
+<<<<<<< HEAD
     for xx,yy in zip(x,y):
     	circ = Circle((xx,yy),5)
     	ax.add_patch(circ)
     if i == 3:
         ax.imshow(occupancy_map, cmap='Greys'); 
         ax.axis([0, 800, 0, 800]);
+=======
+    #for xx,yy in zip(x,y):
+    #	circ = Circle((xx,yy),0.5)
+    #	ax.add_patch(circ)
+
+    circ = Circle((x,y),5)
+    ax.add_patch(circ)
+    plt.show()
+    #sleep(3)
+>>>>>>> e899b2893c82250af4b210c2cf3d709782588738
     
 
 def visualize_timestep(X_bar, tstep):
@@ -38,11 +49,12 @@ def visualize_timestep(X_bar, tstep):
     plt.pause(0.00001)
     scat.remove()
 
+
 def init_particles_random(num_particles, occupancy_map):
 
     # initialize [x, y, theta] positions in world_frame for all particles
     # (randomly across the map) 
-    y0_vals = np.random.uniform( 0, 7000, (num_particles, 1) )
+    y0_vals = np.random.uniform( 0, 7000, (num_particles, 1) ) # Generate the 
     x0_vals = np.random.uniform( 3000, 7000, (num_particles, 1) )
     theta0_vals = np.random.uniform( -3.14, 3.14, (num_particles, 1) )
 
@@ -54,16 +66,49 @@ def init_particles_random(num_particles, occupancy_map):
     
     return X_bar_init
 
+
+
+
 def init_particles_freespace(num_particles, occupancy_map):
 
     # initialize [x, y, theta] positions in world_frame for all particles
     # (in free space areas of the map)
 
-    """
-    TODO : Add your code here
-    """ 
+    # Initialize the arrays so that they are the proper size
+    print("Starting init_particles_freespace")
+    startTime = time.time()
+    y0_vals = np.random.uniform( 0, 7000, (num_particles, 1) ) # Generate the 
+    x0_vals = np.random.uniform( 3000, 7000, (num_particles, 1) )
 
+    for I in range(num_particles):
+
+        stillWorking = True
+        while stillWorking == True:
+            # Generate a particle location
+            Y = np.random.uniform( 0, 7000)
+            X = np.random.uniform( 3000, 7000)
+
+            # Check to see if this is in free space or not
+            Xx = int(X/10) # Convert from cm to dm
+            Yy = int(Y/10)
+            if occupancy_map[Yy,Xx] == 1:
+                stillWorking = False
+        #print("X: %d\tY: %d" % (X,Y))
+        x0_vals[I] = X
+        y0_vals[I] = Y
+
+
+    theta0_vals = np.random.uniform( -3.14, 3.14, (num_particles, 1) )
+
+    # initialize weights for all particles
+    w0_vals = np.ones( (num_particles,1), dtype=np.float64)
+    w0_vals = w0_vals / num_particles
+    X_bar_init = np.hstack((x0_vals,y0_vals,theta0_vals,w0_vals))
+    print("finished init_particles_freespace")
+    print("Completed in  %s seconds" % (time.time() - startTime))
     return X_bar_init
+
+
 
 def main():
 
@@ -95,7 +140,9 @@ def main():
     resampler = Resampling()
 
     num_particles = 500
-    X_bar = init_particles_random(num_particles, occupancy_map)
+    #X_bar = init_particles_random(num_particles, occupancy_map)
+    X_bar = init_particles_freespace(num_particles, occupancy_map)
+
        
     vis_flag = 1
 
@@ -105,6 +152,9 @@ def main():
     i = 1
     first_time_idx = True
     for time_idx, line in enumerate(logfile):
+        # time_idx is just a counter
+        # line is the text from a line in the file.
+
 
         # Read a single 'line' from the log file (can be either odometry or laser measurement)
         meas_type = line[0] # L : laser scan measurement, O : odometry measurement
@@ -116,7 +166,7 @@ def main():
         # if ((time_stamp <= 0.0) | (meas_type == "O")): # ignore pure odometry measurements for now (faster debugging) 
             # continue
 
-        if (meas_type == "L"):
+        if (meas_type == "L"):  # Laser data
              odometry_laser = meas_vals[3:6] # [x, y, theta] coordinates of laser in odometry frame
              ranges = meas_vals[6:-1] # 180 range measurement values from single laser scan
         
