@@ -248,14 +248,14 @@ class SensorModel:
             firstGaussianSample = self.numSamples - particleMeasurement
             lastGaussianSample = firstGaussianSample + self.numSamples
 
-            probability += self.gaussPDF[0][firstGaussianSample + actualMeasurement]
+            probability += self.gaussPDF[0][int(firstGaussianSample) + int(actualMeasurement)]
 
 
 
             # find the sum of the whole PDF to divide by
             normalizer = self.uniformSum
             normalizer += self.expPDF[1][int(particleMeasurement)]
-            normalizer += self.gaussPDF[1][lastGaussianSample] - self.gaussPDF[1][firstGaussianSample - 1]
+            normalizer += self.gaussPDF[1][int(lastGaussianSample)] - self.gaussPDF[1][int(firstGaussianSample) - 1]
 
             # Calculate the actual probability
             probability /= normalizer
