@@ -35,20 +35,19 @@ class Resampling:
     def low_variance_sampler(self, X_bar, M):
 
         """
-        param[in] X_bar : [num_particles x 4] sized array containing [x, y, theta, wt] values for all particles
-        param[out] X_bar_resampled : [num_particles x 4] sized array containing [x, y, theta, wt] values for resampled set of particles
+        X_bar : [num_particles x 4] sized array containing [x, y, theta, wt] values for all particles
+        X_bar_resampled : [num_particles x 4] sized array containing [x, y, theta, wt] values for resampled set of particles
+        M is the number of particles
         """
 
-        """
-        TODO : Add your code here
-        """
         X_bar_resampled = []
-        r = np.random.uniform(0,(1/M))
-        c = X_bar[0,3]
-        print(c)
+        r = np.random.uniform(0,(1/float(M))) # gives a number that is between 0 and 1/M, which is the width between the even samples
+        c = X_bar[0,3] # The weight for the first particle
+        #print(c)
         i = 1
-        for m in range(0, M):
-            U = r + (m - 1) * (1/M)
+        for m in range(1,M+1):
+            U = r + (m - 1) * (1/M)  # U is position where it samples from
+            # Add the weights of the particles until they are greater than U
             while U > c :
                 i = i + 1
                 c = c + X_bar[i,3]
