@@ -46,7 +46,7 @@ def init_particles_random(num_particles, occupancy_map):
 
     # initialize [x, y, theta] positions in world_frame for all particles
     # (randomly across the map) 
-    y0_vals = np.random.uniform( 0, 7000, (num_particles, 1) )
+    y0_vals = np.random.uniform( 0, 7000, (num_particles, 1) ) # Generate the 
     x0_vals = np.random.uniform( 3000, 7000, (num_particles, 1) )
     theta0_vals = np.random.uniform( -3.14, 3.14, (num_particles, 1) )
 
@@ -58,15 +58,46 @@ def init_particles_random(num_particles, occupancy_map):
     
     return X_bar_init
 
+
+
+
 def init_particles_freespace(num_particles, occupancy_map):
 
     # initialize [x, y, theta] positions in world_frame for all particles
     # (in free space areas of the map)
 
-    """
-    TODO : Add your code here
-    """ 
+    # Initialize the arrays so that they are the proper size
+    y0_vals = np.random.uniform( 0, 7000, (num_particles, 1) ) # Generate the 
+    x0_vals = np.random.uniform( 3000, 7000, (num_particles, 1) )
 
+    for I in range(num_particles):
+
+        stillWorking = True
+        while stillWorking == True:
+            # Generate a particle location
+            X = np.random.uniform( 0, 7000)
+            Y = np.random.uniform( 3000, 7000)
+
+            # Check to see if this is in free space or not
+            Xx = int(X/10) # Convert from cm to dm
+            Yy = int(Y/10)
+            if occupancy_map[Yy,Xx] == 1:
+                stillWorking = False
+        print("X: %d\tY: %d" % (X,Y))
+        x0_vals[I] = X
+        y0_vals[I] = Y
+
+
+
+
+
+
+    theta0_vals = np.random.uniform( -3.14, 3.14, (num_particles, 1) )
+
+    # initialize weights for all particles
+    w0_vals = np.ones( (num_particles,1), dtype=np.float64)
+    w0_vals = w0_vals / num_particles
+    X_bar_init = np.hstack((x0_vals,y0_vals,theta0_vals,w0_vals))
     return X_bar_init
 
 def main():
@@ -99,7 +130,9 @@ def main():
     resampler = Resampling()
 
     num_particles = 500
-    X_bar = init_particles_random(num_particles, occupancy_map)
+    #X_bar = init_particles_random(num_particles, occupancy_map)
+    X_bar = init_particles_freespace(num_particles, occupancy_map)
+
        
     vis_flag = 1
 
