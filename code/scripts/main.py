@@ -13,7 +13,6 @@ from matplotlib import figure as fig
 import time
 from time import sleep
 
-<<<<<<< HEAD
 def visualize_map(occupancy_map,particles):
     plt.figure(1)
     #ax.set_aspect('equal')
@@ -24,8 +23,12 @@ def visualize_map(occupancy_map,particles):
     y = particles[:,1]/10
     #x = np.mean(x);
     #y = np.mean(y);
-  
-=======
+    plt.imshow(occupancy_map, cmap='Greys');
+    plt.scatter(x,y); 
+    plt.show(block=False)
+    time.sleep(3)
+    plt.close()
+
 def visualize_map(occupancy_map,particles, i):
     
     plt.figure(1); 
@@ -213,11 +216,8 @@ def main():
         """
         RESAMPLING
         """
-<<<<<<< HEAD
         X_bar = resampler.low_variance_sampler(X_bar,num_particles)
-=======
-        X_bar = resampler.low_variance_sampler(X_bar, num_particles)
->>>>>>> 5ab1adf8be08e59cb81875dea8caacfdf1c20957
+
 
         if vis_flag:
             visualize_timestep(X_bar, time_idx)
