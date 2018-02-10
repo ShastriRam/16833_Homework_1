@@ -28,23 +28,9 @@ def visualize_map(occupancy_map,particles):
 =======
 def visualize_map(occupancy_map,particles, i):
     
-    figure,ax = plt.subplots(1)
-    ax.set_aspect('equal')
-    mng = plt.get_current_fig_manager();
-    mng.resize(*mng.window.maxsize())
-    plt.ion(); 
+    plt.figure(1); 
     x = particles[:,0]/10 
     y = particles[:,1]/10
->>>>>>> 5ab1adf8be08e59cb81875dea8caacfdf1c20957
-    # Now, loop through coord arrays, and create a circle at each x,y pair
-<<<<<<< HEAD
-    for xx,yy in zip(x,y):
-    	circ = Circle((xx,yy),5)
-    	ax.add_patch(circ)
-    if i == 3:
-        ax.imshow(occupancy_map, cmap='Greys'); 
-        ax.axis([0, 800, 0, 800]);
-=======
     #for xx,yy in zip(x,y):
     #	circ = Circle((xx,yy),0.5)
     #	ax.add_patch(circ)
@@ -54,16 +40,12 @@ def visualize_map(occupancy_map,particles, i):
     #ax.add_patch(circ)
     #plt.show()
     #sleep(3)
-<<<<<<< HEAD
     plt.imshow(occupancy_map, cmap='Greys'); 
     plt.scatter(x,y); 
     plt.show(block=False)
     time.sleep(3)
     plt.close()
 
-=======
->>>>>>> e899b2893c82250af4b210c2cf3d709782588738
->>>>>>> 5ab1adf8be08e59cb81875dea8caacfdf1c20957
     
 
 def visualize_timestep(X_bar, tstep):
