@@ -29,6 +29,7 @@ def visualize_map(occupancy_map,particles):
     #	circ = Circle((xx,yy),0.5)
     #	ax.add_patch(circ)
 
+
     #circ = Circle((x,y),5)
     #ax.add_patch(circ)
     #plt.show()
@@ -38,6 +39,7 @@ def visualize_map(occupancy_map,particles):
     plt.show(block=False)
     time.sleep(3)
     plt.close()
+
     
 
 def visualize_timestep(X_bar, tstep):
@@ -74,6 +76,7 @@ def init_particles_freespace(num_particles, occupancy_map):
 
     # Initialize the arrays so that they are the proper size
     print("Starting init_particles_freespace")
+    startTime = time.time()
     y0_vals = np.random.uniform( 0, 7000, (num_particles, 1) ) # Generate the 
     x0_vals = np.random.uniform( 3000, 7000, (num_particles, 1) )
 
@@ -82,15 +85,15 @@ def init_particles_freespace(num_particles, occupancy_map):
         stillWorking = True
         while stillWorking == True:
             # Generate a particle location
-            X = np.random.uniform( 0, 7000)
-            Y = np.random.uniform( 3000, 7000)
+            Y = np.random.uniform( 0, 7000)
+            X = np.random.uniform( 3000, 7000)
 
             # Check to see if this is in free space or not
             Xx = int(X/10) # Convert from cm to dm
             Yy = int(Y/10)
             if occupancy_map[Yy,Xx] == 1:
                 stillWorking = False
-        print("X: %d\tY: %d" % (X,Y))
+        #print("X: %d\tY: %d" % (X,Y))
         x0_vals[I] = X
         y0_vals[I] = Y
 
@@ -102,6 +105,7 @@ def init_particles_freespace(num_particles, occupancy_map):
     w0_vals = w0_vals / num_particles
     X_bar_init = np.hstack((x0_vals,y0_vals,theta0_vals,w0_vals))
     print("finished init_particles_freespace")
+    print("Completed in  %s seconds" % (time.time() - startTime))
     return X_bar_init
 
 
