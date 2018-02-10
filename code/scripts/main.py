@@ -42,6 +42,7 @@ def visualize_timestep(X_bar, tstep):
     plt.pause(0.00001)
     scat.remove()
 
+
 def init_particles_random(num_particles, occupancy_map):
 
     # initialize [x, y, theta] positions in world_frame for all particles
@@ -67,6 +68,7 @@ def init_particles_freespace(num_particles, occupancy_map):
     # (in free space areas of the map)
 
     # Initialize the arrays so that they are the proper size
+    print("Starting init_particles_freespace")
     y0_vals = np.random.uniform( 0, 7000, (num_particles, 1) ) # Generate the 
     x0_vals = np.random.uniform( 3000, 7000, (num_particles, 1) )
 
@@ -88,17 +90,16 @@ def init_particles_freespace(num_particles, occupancy_map):
         y0_vals[I] = Y
 
 
-
-
-
-
     theta0_vals = np.random.uniform( -3.14, 3.14, (num_particles, 1) )
 
     # initialize weights for all particles
     w0_vals = np.ones( (num_particles,1), dtype=np.float64)
     w0_vals = w0_vals / num_particles
     X_bar_init = np.hstack((x0_vals,y0_vals,theta0_vals,w0_vals))
+    print("finished init_particles_freespace")
     return X_bar_init
+
+
 
 def main():
 
@@ -142,6 +143,9 @@ def main():
 
     first_time_idx = True
     for time_idx, line in enumerate(logfile):
+        # time_idx is just a counter
+        # line is the text from a line in the file.
+
 
         # Read a single 'line' from the log file (can be either odometry or laser measurement)
         meas_type = line[0] # L : laser scan measurement, O : odometry measurement
@@ -153,7 +157,7 @@ def main():
         # if ((time_stamp <= 0.0) | (meas_type == "O")): # ignore pure odometry measurements for now (faster debugging) 
             # continue
 
-        if (meas_type == "L"):
+        if (meas_type == "L"):  # Laser data
              odometry_laser = meas_vals[3:6] # [x, y, theta] coordinates of laser in odometry frame
              ranges = meas_vals[6:-1] # 180 range measurement values from single laser scan
         
