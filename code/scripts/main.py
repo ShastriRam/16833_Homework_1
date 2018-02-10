@@ -14,25 +14,30 @@ import time
 from time import sleep
 
 def visualize_map(occupancy_map,particles):
-    fig,ax = plt.subplots(1)
-    ax.set_aspect('equal')
+    plt.figure(1)
+    #ax.set_aspect('equal')
     # plt.switch_backend('TkAgg')
-    mng = plt.get_current_fig_manager();  # mng.resize(*mng.window.maxsize())
-    plt.ion(); ax.imshow(occupancy_map, cmap='Greys'); ax.axis([0, 800, 0, 800]);
-    x = particles[:,0] 
-    y = particles[:,1]
-    x = np.mean(x);
-    y = np.mean(y);
+    #mng = plt.get_current_fig_manager();  # mng.resize(*mng.window.maxsize())
+    #plt.ion(); ax.imshow(occupancy_map, cmap='Greys'); ax.axis([0, 800, 0, 800]);
+    x = particles[:,0]/10 
+    y = particles[:,1]/10
+    #x = np.mean(x);
+    #y = np.mean(y);
   
     # Now, loop through coord arrays, and create a circle at each x,y pair
     #for xx,yy in zip(x,y):
     #	circ = Circle((xx,yy),0.5)
     #	ax.add_patch(circ)
 
-    circ = Circle((x,y),5)
-    ax.add_patch(circ)
-    plt.show()
-    sleep(3)
+    #circ = Circle((x,y),5)
+    #ax.add_patch(circ)
+    #plt.show()
+    #sleep(3)
+    plt.imshow(occupancy_map, cmap='Greys'); 
+    plt.scatter(x,y); 
+    plt.show(block=False)
+    time.sleep(3)
+    plt.close()
     
 
 def visualize_timestep(X_bar, tstep):
@@ -197,7 +202,7 @@ def main():
         """
         RESAMPLING
         """
-        X_bar = resampler.low_variance_sampler(X_bar)
+        X_bar = resampler.low_variance_sampler(X_bar,num_particles)
 
         if vis_flag:
             visualize_timestep(X_bar, time_idx)
