@@ -13,6 +13,7 @@ from matplotlib import figure as fig
 import time
 from time import sleep
 
+<<<<<<< HEAD
 def visualize_map(occupancy_map,particles):
     plt.figure(1)
     #ax.set_aspect('equal')
@@ -24,7 +25,26 @@ def visualize_map(occupancy_map,particles):
     #x = np.mean(x);
     #y = np.mean(y);
   
+=======
+def visualize_map(occupancy_map,particles, i):
+    
+    figure,ax = plt.subplots(1)
+    ax.set_aspect('equal')
+    mng = plt.get_current_fig_manager();
+    mng.resize(*mng.window.maxsize())
+    plt.ion(); 
+    x = particles[:,0]/10 
+    y = particles[:,1]/10
+>>>>>>> 5ab1adf8be08e59cb81875dea8caacfdf1c20957
     # Now, loop through coord arrays, and create a circle at each x,y pair
+<<<<<<< HEAD
+    for xx,yy in zip(x,y):
+    	circ = Circle((xx,yy),5)
+    	ax.add_patch(circ)
+    if i == 3:
+        ax.imshow(occupancy_map, cmap='Greys'); 
+        ax.axis([0, 800, 0, 800]);
+=======
     #for xx,yy in zip(x,y):
     #	circ = Circle((xx,yy),0.5)
     #	ax.add_patch(circ)
@@ -34,12 +54,16 @@ def visualize_map(occupancy_map,particles):
     #ax.add_patch(circ)
     #plt.show()
     #sleep(3)
+<<<<<<< HEAD
     plt.imshow(occupancy_map, cmap='Greys'); 
     plt.scatter(x,y); 
     plt.show(block=False)
     time.sleep(3)
     plt.close()
 
+=======
+>>>>>>> e899b2893c82250af4b210c2cf3d709782588738
+>>>>>>> 5ab1adf8be08e59cb81875dea8caacfdf1c20957
     
 
 def visualize_timestep(X_bar, tstep):
@@ -149,7 +173,7 @@ def main():
     """
     Monte Carlo Localization Algorithm : Main Loop
     """
-
+    i = 1
     first_time_idx = True
     for time_idx, line in enumerate(logfile):
         # time_idx is just a counter
@@ -202,11 +226,16 @@ def main():
         u_t0 = u_t1
 
         if vis_flag:
-            visualize_map(occupancy_map,X_bar)
+            visualize_map(occupancy_map,X_bar,i)
+            i = i + 1
         """
         RESAMPLING
         """
+<<<<<<< HEAD
         X_bar = resampler.low_variance_sampler(X_bar,num_particles)
+=======
+        X_bar = resampler.low_variance_sampler(X_bar, num_particles)
+>>>>>>> 5ab1adf8be08e59cb81875dea8caacfdf1c20957
 
         if vis_flag:
             visualize_timestep(X_bar, time_idx)
