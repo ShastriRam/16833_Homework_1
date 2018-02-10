@@ -23,6 +23,12 @@ class Resampling:
         """
         TODO : Add your code here
         """
+        p = X_bar[:,3]
+        p = p/numpy.sum(p) #p = np.divide(p, numpy.sum(p))
+        print (numpy.sum(p))
+        uniform_sample = np.random.uniform(size=M)
+        p_cum = np.cumsum(p)
+        X_bar_resampled = np.searchsorted(p_cum,uniform_sample,side='right')
 
         return X_bar_resampled
 
@@ -36,7 +42,21 @@ class Resampling:
         """
         TODO : Add your code here
         """
-        
+        X_bar_resampled = []
+        M = 500
+        r = np.random.uniform(0,(1/M))
+        c = X_bar[0,3]
+        print(c)
+        i = 1
+        for m in range(1, M):
+            U = r + (m - 1) * (1/M)
+            while U > c :
+                i = i + 1
+                c = c + X_bar[i,3]
+            X_bar_resampled.append(X_bar[i])
+        X_bar_resampled = np.asarray(X_bar_resampled)
+       
+
         return X_bar_resampled
 
 if __name__ == "__main__":
