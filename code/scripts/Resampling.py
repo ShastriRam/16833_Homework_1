@@ -13,6 +13,7 @@ class Resampling:
         TODO : Initialize resampling process parameters here
         """
 
+
     def multinomial_sampler(self, X_bar, M):
 
         """
@@ -31,6 +32,7 @@ class Resampling:
         X_bar_resampled = np.searchsorted(p_cum,uniform_sample,side='right')
 
         return X_bar_resampled
+
 
     def low_variance_sampler(self, X_bar, M):
 

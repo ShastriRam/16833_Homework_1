@@ -13,33 +13,42 @@ from matplotlib import figure as fig
 import time
 from time import sleep
 
-def visualize_map(occupancy_map,particles, i):
-    
-    figure,ax = plt.subplots(1)
-    ax.set_aspect('equal')
-    mng = plt.get_current_fig_manager();
-    mng.resize(*mng.window.maxsize())
-    plt.ion(); 
+def visualize_map(occupancy_map,particles):
+    plt.figure(1)
+    #ax.set_aspect('equal')
+    # plt.switch_backend('TkAgg')
+    #mng = plt.get_current_fig_manager();  # mng.resize(*mng.window.maxsize())
+    #plt.ion(); ax.imshow(occupancy_map, cmap='Greys'); ax.axis([0, 800, 0, 800]);
     x = particles[:,0]/10 
     y = particles[:,1]/10
-    # Now, loop through coord arrays, and create a circle at each x,y pair
-<<<<<<< HEAD
-    for xx,yy in zip(x,y):
-    	circ = Circle((xx,yy),5)
-    	ax.add_patch(circ)
-    if i == 3:
-        ax.imshow(occupancy_map, cmap='Greys'); 
-        ax.axis([0, 800, 0, 800]);
-=======
+    #x = np.mean(x);
+    #y = np.mean(y);
+    plt.imshow(occupancy_map, cmap='Greys');
+    plt.scatter(x,y); 
+    plt.show(block=False)
+    time.sleep(3)
+    plt.close()
+
+def visualize_map(occupancy_map,particles, i):
+    
+    plt.figure(1); 
+    x = particles[:,0]/10 
+    y = particles[:,1]/10
     #for xx,yy in zip(x,y):
     #	circ = Circle((xx,yy),0.5)
     #	ax.add_patch(circ)
 
-    circ = Circle((x,y),5)
-    ax.add_patch(circ)
-    plt.show()
+
+    #circ = Circle((x,y),5)
+    #ax.add_patch(circ)
+    #plt.show()
     #sleep(3)
->>>>>>> e899b2893c82250af4b210c2cf3d709782588738
+    plt.imshow(occupancy_map, cmap='Greys'); 
+    plt.scatter(x,y); 
+    plt.show(block=False)
+    time.sleep(3)
+    plt.close()
+
     
 
 def visualize_timestep(X_bar, tstep):
@@ -207,7 +216,8 @@ def main():
         """
         RESAMPLING
         """
-        X_bar = resampler.low_variance_sampler(X_bar, num_particles)
+        X_bar = resampler.low_variance_sampler(X_bar,num_particles)
+
 
         if vis_flag:
             visualize_timestep(X_bar, time_idx)
