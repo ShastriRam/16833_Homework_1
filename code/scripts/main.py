@@ -4,8 +4,8 @@ import pdb
 
 from MapReader import MapReader
 from MotionModel import MotionModel
-#from SensorModel2 import SensorModel   #Shastri's version
-from SensorModel import SensorModel     # Jack's version
+from SensorModel2 import SensorModel   #Shastri's version
+#from SensorModel import SensorModel     # Jack's version
 from Resampling import Resampling
 
 from matplotlib import pyplot as plt
@@ -83,7 +83,7 @@ def main():
     Initialize Parameters
     """
     ###########################################  SET THE NUMBER OF PARTICLES #####################################
-    num_particles = 5000
+    num_particles = 500
     ###########################################  SET THE NUMBER OF PARTICLES #####################################
 
     src_path_map = '../data/map/wean.dat'
@@ -100,7 +100,6 @@ def main():
     sensor_model = SensorModel(occupancy_map)
     resampler = Resampling()
 
-    num_particles = 10
 
     #particles = init_particles_random(num_particles, occupancy_map)
     particles = init_particles_freespace(num_particles, occupancy_map)
@@ -172,34 +171,23 @@ def main():
                 
         print '***********Particles before normalizing***************'
         print(particles)
-        
+
+        """
         #normalize the weights
         minWeight = min(particles[:,3]);
         maxWeight = max(particles[:,3]);
         weightRng = (maxWeight - minWeight);
-        if (int(weightRng)==0):
+        if (abs(weightRng)<0.0001):
             particles[:,3] = (1/float(num_particles))*np.ones(num_particles);
         else:
             particles[:,3] = (particles[:,3] - minWeight)/weightRng;
 
         print '***********Particles after normalizing***************'
         print(particles)
-        
-        """
-        RESAMPLING
         """
 
-        print("Resampling the particles")
-        startTime = time.time()
-        # Adjust the particle weights to the range of 0 to 1
-        minWeight = min(particles[:,3])
-        maxWeight = max(particles[:,3])
-        weightRange = maxWeight - minWeight
-        particles[:,3] = (particles[:,3] - minWeight)/weightRange
-
-
-        particles = resampler.low_variance_sampler(particles,num_particles)
-        #particles = resampler.multinomial_sampler(particles, num_particles)
+        #particles = resampler.low_variance_sampler(particles,num_particles)
+        particles = resampler.multinomial_sampler(particles, num_particles)
         #print(particles)
         print("Completed in  %s seconds" % (time.time() - startTime))  # this is currently taking about .4 seconds per particle
         # Resampling typically takes 8 ms for 5000 particles.
