@@ -19,15 +19,14 @@ class SensorModel:
     def __init__(self, occupancy_map):
 
         # Weights for the various distributions
-        self.zHit = 0.6
-        self.zShort = 0.3
-        self.zMax = 0.05
-        self.zRand = 0.05;
+        self.zHit = 20
+        self.zShort = 8
+        self.zMax = 1
+        self.zRand = 30.0;
 
-        self.sigmaHit = 5 # stdev of the gaussian
-        self.lambdaShort = float(3); # Adjusts the exponential
+        self.sigmaHit = 50 # stdev of the gaussian
+        self.lambdaShort = .005; # Adjusts the exponential
         self.maxRange = float(8183); # The max lidar reading
-
         self.distrShort = expon(scale=1/self.lambdaShort);
 
         self.occupancyMap = occupancy_map
