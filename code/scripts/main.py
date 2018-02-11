@@ -170,36 +170,27 @@ def main():
         particles = particles_new
         lastState = currentState
                 
-        print '***********Particles before normalizing***************'
-        print(particles)
+        #print '***********Particles before normalizing***************'
+        #print(particles)
         
-        #normalize the weights
-        minWeight = min(particles[:,3]);
-        maxWeight = max(particles[:,3]);
-        weightRng = (maxWeight - minWeight);
-        if (int(weightRng)==0):
-            particles[:,3] = (1/float(num_particles))*np.ones(num_particles);
-        else:
-            particles[:,3] = (particles[:,3] - minWeight)/weightRng;
+        # #normalize the weights
+        # minWeight = min(particles[:,3]);
+        # maxWeight = max(particles[:,3]);
+        # weightRng = (maxWeight - minWeight);
+        # if (int(weightRng)==0):
+        #     particles[:,3] = (1/float(num_particles))*np.ones(num_particles);
+        # else:
+        #     particles[:,3] = (particles[:,3] - minWeight)/weightRng;
 
-        print '***********Particles after normalizing***************'
-        print(particles)
+        # #print '***********Particles after normalizing***************'
+        #print(particles)
         
         """
         RESAMPLING
         """
 
-        print("Resampling the particles")
-        startTime = time.time()
-        # Adjust the particle weights to the range of 0 to 1
-        minWeight = min(particles[:,3])
-        maxWeight = max(particles[:,3])
-        weightRange = maxWeight - minWeight
-        particles[:,3] = (particles[:,3] - minWeight)/weightRange
-
-
-        particles = resampler.low_variance_sampler(particles,num_particles)
-        #particles = resampler.multinomial_sampler(particles, num_particles)
+        #particles = resampler.low_variance_sampler(particles,num_particles)
+        particles = resampler.multinomial_sampler(particles, num_particles)
         #print(particles)
         print("Completed in  %s seconds" % (time.time() - startTime))  # this is currently taking about .4 seconds per particle
         # Resampling typically takes 8 ms for 5000 particles.

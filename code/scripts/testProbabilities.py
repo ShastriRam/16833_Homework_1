@@ -3,7 +3,7 @@ import sys
 
 from MapReader import MapReader
 from MotionModel import MotionModel
-from SensorModel import SensorModel
+from SensorModel2 import SensorModel
 from Resampling import Resampling
 
 from matplotlib import pyplot as plt
@@ -49,22 +49,40 @@ def main():
     
     #plotProbabilities(gaussPDF)
 
-
+    # my Bin-based version 
     x = np.linspace(expon.ppf(0.01), expon.ppf(0.99), numSamples) # Makes numSamples samples with a probability ranging from .99 to .1
     expPDF = expon.pdf(x)
     #plotProbabilities(expPDF)
 
-    # lambdaShort = 1
+
+
+
+    # # Shastri's version
+    # lambdaShort = 1.0
     # distrShort = expon(scale=1/lambdaShort)
     # expCurv = np.zeros(1000)
     
-    # index = 0;
+    # index = 0
+    # eta = 1
     # for I in range (1000):
-    #     expCurv(I) = distrShort.pdf(I)
+    #     expCurv(I) = eta*distrShort.pdf(I);
 
     # plotProbabilities(expCurve)
 
-    # print (expPDF)
+
+
+    # def probShort(self, zRayCast, zK):
+    #     #if (int(zRayCast)==0):
+    #      #   zRayCast=0.001; 
+    #     eta = 1    #1/(1-math.exp(-self.lambdaShort*zRayCast))
+    #     if ( (zK>0) & (zK<zRayCast)):
+    #         pShort=eta*self.distrShort.pdf(zK);
+    #     else:
+    #         pShort=0;
+    #     return pShort;
+
+
+    
 
 if __name__=="__main__":
     main()
