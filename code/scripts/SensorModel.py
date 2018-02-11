@@ -37,8 +37,8 @@ class SensorModel:
         ############################## KNOBS TO TURN #########################################
         # Adjust these to get an acceptable distribution.  The distribution is adjusted later
         # To get its sum to equal 1.
-        self.stdev = 1   # Adjusts the width of the gaussian
-        self.exponentialScaleFactor = 1/50   # The sum of the exponential curve that I am generating is ~21.6.  
+        self.stdev = 100   # Adjusts the width of the gaussian - stdev is this many samples wide
+        self.exponentialScaleFactor = .3   # The sum of the exponential curve that I am generating is ~21.6.  
                                         # The values as initially generated range from .99 to .01
         self.uniformValue = .05 # This is the value that is used in each bin for the uniform distribution
         ######################################################################################
@@ -159,6 +159,40 @@ class SensorModel:
         return distance  
 
 
+
+
+
+    def calculateProbability(self,actualMeasurement, particleMeasurement):
+        # Calculates the probability that the particle is in the right place given the two measurements
+  
+        probability = self.uniformValue;
+        if actualMeasurement <= particleMeasurement:
+            probability += self.expPDF[0][int(actualMeasurement)]
+
+        # Figure out the shift of the gaussian.
+        # As is, the center is at sample numSamples 
+        firstGaussianSample = self.numSamples-1 - particleMeasurement
+        lastGaussianSample = firstGaussianSample + self.numSamples-1
+
+        probability += self.gaussPDF[0][int(firstGaussianSample) + int(actualMeasurement)]
+
+
+
+        # find the sum of the whole PDF to divide by
+        normalizer = self.uniformSum
+        normalizer += self.expPDF[1][int(particleMeasurement)]
+        normalizer += self.gaussPDF[1][int(lastGaussianSample)] - self.gaussPDF[1][int(firstGaussianSample) - 1]
+
+        # Calculate the actual probability
+        probability /= normalizer
+
+        return probability
+
+
+
+
+
+
     def beam_range_finder_model(self, actualMeasurements, particleState):
         """
         Given a state for the particle and the actual LIDAR readings, output a probability 
@@ -231,29 +265,9 @@ class SensorModel:
             # print ("Actual: %f\tParticle: %f" % (actualMeasurement,particleMeasurement))
 
 
+            probability = calculateProbability(actualmeasurement, particleMeasurement)
 
-
-            # Calculate the probability for this reading.  
-            probability = self.uniformValue;
-            if actualMeasurement <= particleMeasurement:
-                probability += self.expPDF[0][int(actualMeasurement)]
-
-            # Figure out the shift of the gaussian.
-            # As is, the center is at sample numSamples 
-            firstGaussianSample = self.numSamples-1 - particleMeasurement
-            lastGaussianSample = firstGaussianSample + self.numSamples-1
-
-            probability += self.gaussPDF[0][int(firstGaussianSample) + int(actualMeasurement)]
-
-
-
-            # find the sum of the whole PDF to divide by
-            normalizer = self.uniformSum
-            normalizer += self.expPDF[1][int(particleMeasurement)]
-            normalizer += self.gaussPDF[1][int(lastGaussianSample)] - self.gaussPDF[1][int(firstGaussianSample) - 1]
-
-            # Calculate the actual probability
-            probability /= normalizer
+            
 
 
 
