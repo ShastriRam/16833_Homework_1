@@ -24,7 +24,7 @@ def visualize_map(occupancy_map,particles):
     #x = np.mean(x);
     #y = np.mean(y);
     plt.imshow(occupancy_map, cmap='Greys');
-    plt.scatter(x,y,color='r'); 
+    plt.scatter(x,y,color='r',marker='.', s = 10); 
     #plt.show(block=False)
     plt.show()
     time.sleep(1)
@@ -53,29 +53,29 @@ def visualize_map(occupancy_map,particles):
 
     
 
-def visualize_timestep(X_bar, tstep):
-    x_locs = X_bar[:,0]/10.0
-    y_locs = X_bar[:,1]/10.0
-    scat = plt.scatter(x_locs, y_locs, c='r', marker='o')
-    plt.pause(0.00001)
-    scat.remove()
+# def visualize_timestep(particles, tstep):
+#     x_locs = particles[:,0]/10.0
+#     y_locs = particles[:,1]/10.0
+#     scat = plt.scatter(x_locs, y_locs, c='r', marker='o')
+#     plt.pause(0.00001)
+#     scat.remove()
 
 
-def init_particles_random(num_particles, occupancy_map):
+# def init_particles_random(num_particles, occupancy_map):
 
-    # initialize [x, y, theta] positions in world_frame for all particles
-    # (randomly across the map) 
-    y0_vals = np.random.uniform( 0, 7000, (num_particles, 1) ) # Generate the 
-    x0_vals = np.random.uniform( 3000, 7000, (num_particles, 1) )
-    theta0_vals = np.random.uniform( -3.14, 3.14, (num_particles, 1) )
+#     # initialize [x, y, theta] positions in world_frame for all particles
+#     # (randomly across the map) 
+#     y0_vals = np.random.uniform( 0, 7000, (num_particles, 1) ) # Generate the 
+#     x0_vals = np.random.uniform( 3000, 7000, (num_particles, 1) )
+#     theta0_vals = np.random.uniform( -3.14, 3.14, (num_particles, 1) )
 
-    # initialize weights for all particles
-    w0_vals = np.ones( (num_particles,1), dtype=np.float64)
-    w0_vals = w0_vals / num_particles
+#     # initialize weights for all particles
+#     w0_vals = np.ones( (num_particles,1), dtype=np.float64)
+#     w0_vals = w0_vals / num_particles
 
-    X_bar_init = np.hstack((x0_vals,y0_vals,theta0_vals,w0_vals))
+#     particles_init = np.hstack((x0_vals,y0_vals,theta0_vals,w0_vals))
     
-    return X_bar_init
+#     return particles_init
 
 
 
@@ -88,23 +88,22 @@ def init_particles_freespace(num_particles, occupancy_map):
     # Initialize the arrays so that they are the proper size
     print("Starting init_particles_freespace")
     startTime = time.time()
-    y0_vals = np.random.uniform( 0, 7000, (num_particles, 1) ) # Generate the 
-    x0_vals = np.random.uniform( 3000, 7000, (num_particles, 1) )
+    x0_vals = np.random.uniform( 3300, 7000, (num_particles, 1)) # Create a initial array so that
+    y0_vals = np.random.uniform( 0, 7500, (num_particles, 1))  # it doesn't get resized each time
 
     for I in range(num_particles):
 
         stillWorking = True
         while stillWorking == True:
             # Generate a particle location
-            Y = np.random.uniform( 0, 7000)
-            X = np.random.uniform( 3000, 7000)
+            X = np.random.uniform( 3300, 7000)
+            Y = np.random.uniform( 0, 7500)
 
             # Check to see if this is in free space or not
             Xx = int(X/10) # Convert from cm to dm
             Yy = int(Y/10)
             if occupancy_map[Yy,Xx] == 1:
                 stillWorking = False
-        #print("X: %d\tY: %d" % (X,Y))
         x0_vals[I] = X
         y0_vals[I] = Y
 
@@ -114,10 +113,10 @@ def init_particles_freespace(num_particles, occupancy_map):
     # initialize weights for all particles
     w0_vals = np.ones( (num_particles,1), dtype=np.float64)
     w0_vals = w0_vals / num_particles
-    X_bar_init = np.hstack((x0_vals,y0_vals,theta0_vals,w0_vals))
+    particles_init = np.hstack((x0_vals,y0_vals,theta0_vals,w0_vals))
     print("finished init_particles_freespace")
     print("Completed in  %s seconds" % (time.time() - startTime))
-    return X_bar_init
+    return particles_init
 
 
 
@@ -129,7 +128,7 @@ def main():
     u_t1 : particle state odometry reading [x, y, theta] at time t [odometry_frame]
     x_t0 : particle state belief [x, y, theta] at time (t-1) [world_frame]
     x_t1 : particle state belief [x, y, theta] at time t [world_frame]
-    X_bar : [num_particles x 4] sized array containing [x, y, theta, wt] values for all particles
+    particles : [num_particles x 4] sized array containing [x, y, theta, wt] values for all particles
     z_t : array of 180 range measurements for each laser scan
     """
 
@@ -150,9 +149,9 @@ def main():
     sensor_model = SensorModel(occupancy_map)
     resampler = Resampling()
 
-    num_particles = 10
-    #X_bar = init_particles_random(num_particles, occupancy_map)
-    X_bar = init_particles_freespace(num_particles, occupancy_map)
+    num_particles = 500
+    #particles = init_particles_random(num_particles, occupancy_map)
+    particles = init_particles_freespace(num_particles, occupancy_map)
 
        
     vis_flag = 1
@@ -170,7 +169,7 @@ def main():
         meas_type = line[0] # L : laser scan measurement, O : odometry measurement
         meas_vals = np.fromstring(line[2:], dtype=np.float64, sep=' ') # convert measurement values from string to double
 
-        odometry_robot = meas_vals[0:3] # odometry reading [x, y, theta] in odometry frame
+        state = meas_vals[0:3] # odometry reading [x, y, theta] in odometry frame
         time_stamp = meas_vals[-1]
 
         # if ((time_stamp <= 0.0) | (meas_type == "O")): # ignore pure odometry measurements for now (faster debugging) 
@@ -184,46 +183,48 @@ def main():
         print "Processing time step " + str(time_idx) + " at time " + str(time_stamp) + "s"
 
         if (first_time_idx):
-            u_t0 = odometry_robot
+            lastState = state
             first_time_idx = False
             continue
 
-        X_bar_new = np.zeros( (num_particles,4), dtype=np.float64)
-        u_t1 = odometry_robot
+        particles_new = np.zeros( (num_particles,4), dtype=np.float64)
+        currentState = state
         for m in range(0, num_particles):
 
             """
             MOTION MODEL
             """
-            x_t0 = X_bar[m, 0:3]
-            x_t1 = motion_model.update(u_t0, u_t1, x_t0)
+            oldParticle = particles[m, 0:3]
+            newParticle = motion_model.update(lastState, currentState, oldParticle)
 
             """
             SENSOR MODEL
             """
             if (meas_type == "L"):
-                z_t = ranges
-                w_t = sensor_model.beam_range_finder_model(z_t, x_t1)
+                #z_t = ranges
+                #w_t = sensor_model.beam_range_finder_model(z_t, newParticle)
+                newParticleWeight = sensor_model.beam_range_finder_model(ranges, newParticle)
                 # w_t = 1/num_particles
-                X_bar_new[m,:] = np.hstack((x_t1, w_t))
+                particles_new[m,:] = np.hstack((newParticle, newParticleWeight))
             else:
-                X_bar_new[m,:] = np.hstack((x_t1, X_bar[m,3]))
+                particles_new[m,:] = np.hstack((newParticle, particles[m,3]))
         
-        X_bar = X_bar_new
-        u_t0 = u_t1
+        particles = particles_new
+        lastState = currentState
 
         if vis_flag:
-            visualize_map(occupancy_map,X_bar)
+            visualize_map(occupancy_map,particles)
         """
         RESAMPLING
         """
-        print(X_bar)
-        X_bar = resampler.low_variance_sampler(X_bar,num_particles)
-
+        
+        #particles = resampler.low_variance_sampler(particles,num_particles)
+        particles = resampler.multinomial_sampler(particles, num_particles)
+        print(particles)
 
 
         # if vis_flag:
-        #     visualize_timestep(X_bar, time_idx)
+        #     visualize_timestep(particles, time_idx)
 
 if __name__=="__main__":
     main()

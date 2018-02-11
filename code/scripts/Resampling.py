@@ -15,21 +15,21 @@ class Resampling:
         """
 
 
-    def multinomial_sampler(self, X_bar, M):
+    def multinomial_sampler(self, oldParticles, numberOfParticles):
 
         """
-        param[in] X_bar : [num_particles x 4] sized array containing [x, y, theta, wt] values for all particles
-        param[out] X_bar_resampled : [num_particles x 4] sized array containing [x, y, theta, wt] values for resampled set of particles
+        param[in] oldParticles : [num_particles x 4] sized array containing [x, y, theta, wt] values for all particles
+        param[out] newParticles : [num_particles x 4] sized array containing [x, y, theta, wt] values for resampled set of particles
         """
 
-        p = X_bar[:,3]
-        p = p/numpy.sum(p) #p = np.divide(p, numpy.sum(p))
-        print (numpy.sum(p))
-        uniform_sample = np.random.uniform(size=M)
-        p_cum = np.cumsum(p)
-        X_bar_resampled = np.searchsorted(p_cum,uniform_sample,side='right')
+        p = oldParticles[:,3] # The particle weights
+        p = p/np.sum(p)  # normalize the weights
+        uniform_sample = np.random.uniform(size=numberOfParticles)  # create numberOfParticles samples between 0 and 1
 
-        return X_bar_resampled
+        cumulativeSumOfWeights = np.cumsum(p)
+        particlesToCopy = np.searchsorted(cumulativeSumOfWeights,uniform_sample,side='right')
+        newParticles = oldParticles[particlesToCopy,:]
+        return newParticles
 
 
     # def low_variance_sampler(self, particles, numberOfParticles):
