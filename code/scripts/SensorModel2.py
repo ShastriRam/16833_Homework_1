@@ -125,7 +125,7 @@ class SensorModel:
         return pHit;
 
     def probShort(self, zRayCast, zK):
-        eta = 1/(1-math.exp(-self.lambdaShort*zRayCast))
+        eta = 1#1/(1-math.exp(-self.lambdaShort*zRayCast))
         if ( (zK>0) & (zK<zRayCast)):
             pShort=eta*self.distrShort.pdf(zK);
         else:
