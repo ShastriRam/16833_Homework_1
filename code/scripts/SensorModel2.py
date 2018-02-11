@@ -17,6 +17,7 @@ class SensorModel:
     """
 
     def __init__(self, occupancy_map):
+<<<<<<< HEAD
 
         self.zHit = 0.7;
         self.zShort = 0.15;
@@ -25,6 +26,18 @@ class SensorModel:
         self.sigmaHit = 10;
         self.lambdaShort = float(5);
         self.maxRange = float(8000);
+=======
+        # Weights for the various distributions
+        self.zHit = 0.6
+        self.zShort = 0.3
+        self.zMax = 0.05
+        self.zRand = 0.05;
+
+        self.sigmaHit = 5 # stdev of the gaussian
+        self.lambdaShort = float(3); # Adjusts the exponential
+        self.maxRange = float(8183); # The max lidar reading
+
+>>>>>>> 10884bb1a11bd6a041d6e3be7adc45ac07b0a655
         self.distrShort = expon(scale=1/self.lambdaShort);
 
         self.occupancyMap = occupancy_map
@@ -114,7 +127,7 @@ class SensorModel:
         #print("Angle: %f\t distance: %f\t%d\t%d" % (globalAngleForBeam,distance,xSteps,ySteps))
         return distance  
 
-
+    # This is for when the lidar is hitting what it should be hitting
     def probHit(self, zRayCast, zK):
         distrHit = norm(loc=zRayCast, scale=self.sigmaHit);
         eta = distrHit.cdf(self.maxRange) - distrHit.cdf(0);
@@ -124,16 +137,24 @@ class SensorModel:
             pHit = 0;
         return pHit;
 
+
+    # This is for when the lidar is hitting something before what it should be hitting
     def probShort(self, zRayCast, zK):
+<<<<<<< HEAD
         #if (int(zRayCast)==0):
          #   zRayCast=0.001; 
         eta = 1#1/(1-math.exp(-self.lambdaShort*zRayCast))
+=======
+        eta = 1    #1/(1-math.exp(-self.lambdaShort*zRayCast))
+>>>>>>> 10884bb1a11bd6a041d6e3be7adc45ac07b0a655
         if ( (zK>0) & (zK<zRayCast)):
             pShort=eta*self.distrShort.pdf(zK);
         else:
             pShort=0;
         return pShort;
 
+
+    # This is for when the lidar returns maximum range
     def probMax(self, zK):
         if(zK==self.maxRange):
             pMax=1;
@@ -142,6 +163,8 @@ class SensorModel:
 
         return pMax;
 
+
+    # This is for random, unexplainable measurements
     def probRandom(self, zK):
         if((zK>0) & (zK<self.maxRange)):
             pRand = 1/self.maxRange;
@@ -151,25 +174,46 @@ class SensorModel:
         return pRand; 
             
 
+    def calculateProbability(self,actualMeasurement,particleMeasurement):
+        # Calculates the probability that the particle is in the right place given the two measurements
+        pHit = self.probHit(particleMeasurement, actualMeasurement);
+        pShort =self.probShort(particleMeasurement, actualMeasurement); 
+        pMax = self.probMax(actualMeasurement);
+        pRand = self.probRandom(actualMeasurement);
+        p = self.zHit*pHit + self.zShort*pShort + self.zMax*pMax + self.zRand*pRand;
+
+        return p
+            
+
+
     def beam_range_finder_model(self, z_t1_arr, x_t1):
         """
         param[in] z_t1_arr : laser range readings [array of 180 values] at time t
         param[in] x_t1 : particle state belief [x, y, theta] at time t [world_frame]
         param[out] prob_zt1 : likelihood of a range scan zt1 at time t
         """
+<<<<<<< HEAD
         q = 0;
         angleIncrement = 12; 
         for i in xrange(0,180,angleIncrement):
             zK = z_t1_arr[i]; 
             zRayCast = self.findMeasurement(zK,x_t1);
+=======
+        q = 1;
+        for i in xrange(len(z_t1_arr)):
+            zK = z_t1_arr[i]; # actualMeasurement
+            zRayCast = self.findMeasurement(zK,x_t1); # ParticleMeasurement
+>>>>>>> 10884bb1a11bd6a041d6e3be7adc45ac07b0a655
             #print 'zRayCast=', zRayCast;
             #print 'zK=',zK;
-            pHit = self.probHit(zRayCast, zK);
-            pShort =self.probShort(zRayCast, zK); 
-            pMax = self.probMax(zK);
-            pRand = self.probRandom(zK);
+            # pHit = self.probHit(zRayCast, zK);
+            # pShort =self.probShort(zRayCast, zK); 
+            # pMax = self.probMax(zK);
+            # pRand = self.probRandom(zK);
 
-            p = self.zHit*pHit + self.zShort*pShort + self.zMax*pMax + self.zRand*pRand;
+            # p = self.zHit*pHit + self.zShort*pShort + self.zMax*pMax + self.zRand*pRand;
+
+            p = calculateProbability(zK,zRayCast)
             
             #print 'p=',p;
             q = q+math.log(p); 
