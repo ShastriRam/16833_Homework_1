@@ -172,7 +172,7 @@ class SensorModel:
 
         ############################## KNOBS TO TURN #########################################
 
-        angleIncrement = 5; # The number of degrees to move when doing calculations.
+        angleIncrement = 12; # The number of degrees to move when doing calculations.
                             # 1 results in calculating every angle.
                             # 2 results in calculating every other angle.
 
@@ -197,7 +197,7 @@ class SensorModel:
         particleLocation = np.array([particleX, particleY])
 
 
-        cumulativeProbability = 0
+        cumulativeProbability = 1  # use 0 if doing log probability
 
         for I in range(0,180,angleIncrement): # calculate a range for all 180 measurements.  To reduce the number 
                                   # of distances calculated, make the last number something other than 1
@@ -215,39 +215,28 @@ class SensorModel:
             particleMeasurement = self.findMeasurement(absoluteAngle, particleLocation) # Returns the measurement in cm
 
 
+            # # ######################### FOR TESTING ONLY ############################                   ############ REMOVE AFTER TESTING
+            # X = particleMeasurement * math.cos(absoluteAngle) + particleX  # This value is in centimeters
+            # Y = particleMeasurement * math.sin(absoluteAngle) + particleY
+
+            # self.rangeLines[I][:] = [particleX/10,particleY/10,X/10,Y/10] # all of the /10 are so it displays correctly on the map
+            # # ######################### FOR TESTING ONLY ############################                   ############ REMOVE AFTER TESTING
 
 
 
-
-
-
-
-
-
-
-
-
-            # ######################### FOR TESTING ONLY ############################                   ############ REMOVE AFTER TESTING
-            X = particleMeasurement * math.cos(absoluteAngle) + particleX  # This value is in centimeters
-            Y = particleMeasurement * math.sin(absoluteAngle) + particleY
-
-            self.rangeLines[I][:] = [particleX/10,particleY/10,X/10,Y/10] # all of the /10 are so it displays correctly on the map
-            # ######################### FOR TESTING ONLY ############################                   ############ REMOVE AFTER TESTING
-
-
-
-
-            #actualMeasurement = round(float(actualMeasurements[I])/10)  # These are coming in up to about 506 and leaving up to 50
-      
-
-            actualMeasurement = 1;
-
+            actualMeasurement = round(float(actualMeasurements[I])/10)  # These are coming in up to about 506 and leaving up to 50
+            #actualMeasurement = actualMeasurements[I]
             particleMeasurement = round(particleMeasurement/10)   
+
+            # print ("Actual: %f\tParticle: %f" % (actualMeasurement,particleMeasurement))
+
+
+
 
             # Calculate the probability for this reading.  
             probability = self.uniformValue;
             if actualMeasurement <= particleMeasurement:
-                probability += self.expPDF[0][actualMeasurement]
+                probability += self.expPDF[0][int(actualMeasurement)]
 
             # Figure out the shift of the gaussian.
             # As is, the center is at sample numSamples 
@@ -266,9 +255,11 @@ class SensorModel:
             # Calculate the actual probability
             probability /= normalizer
 
-            # Now find the log value of the probability
-            cumulativeProbability += math.log(probability)
 
+
+            # Now find the log value of the probability
+            #cumulativeProbability += math.log(probability)
+            cumulativeProbability *= probability
 
         return cumulativeProbability   
  
