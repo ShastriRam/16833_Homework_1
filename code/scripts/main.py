@@ -22,7 +22,7 @@ def visualize_map(occupancy_map,particles):
     plt.scatter(x,y,color='r',marker='.', s = 10); 
     plt.show(block=False)
     #plt.show()
-    time.sleep(3)
+    time.sleep(1)
     plt.close()
 
 
