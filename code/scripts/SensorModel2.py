@@ -19,11 +19,11 @@ class SensorModel:
     def __init__(self, occupancy_map):
 
         self.zHit = 0.7;
-        self.zShort = 0.2;
+        self.zShort = 0.15;
         self.zMax = 0.05;
-        self.zRand = 0.05;
-        self.sigmaHit = 5;
-        self.lambdaShort = float(50);
+        self.zRand = 0.1;
+        self.sigmaHit = 10;
+        self.lambdaShort = float(5);
         self.maxRange = float(8000);
         self.distrShort = expon(scale=1/self.lambdaShort);
 
@@ -116,7 +116,7 @@ class SensorModel:
 
 
     def probHit(self, zRayCast, zK):
-        distrHit = norm(zRayCast, self.sigmaHit*self.sigmaHit);
+        distrHit = norm(loc=zRayCast, scale=self.sigmaHit);
         eta = distrHit.cdf(self.maxRange) - distrHit.cdf(0);
         if ((zK>0) & (zK<self.maxRange)):
             pHit = distrHit.pdf(zK)*eta;
@@ -125,6 +125,8 @@ class SensorModel:
         return pHit;
 
     def probShort(self, zRayCast, zK):
+        #if (int(zRayCast)==0):
+         #   zRayCast=0.001; 
         eta = 1#1/(1-math.exp(-self.lambdaShort*zRayCast))
         if ( (zK>0) & (zK<zRayCast)):
             pShort=eta*self.distrShort.pdf(zK);
@@ -155,8 +157,9 @@ class SensorModel:
         param[in] x_t1 : particle state belief [x, y, theta] at time t [world_frame]
         param[out] prob_zt1 : likelihood of a range scan zt1 at time t
         """
-        q = 1;
-        for i in xrange(len(z_t1_arr)):
+        q = 0;
+        angleIncrement = 12; 
+        for i in xrange(0,180,angleIncrement):
             zK = z_t1_arr[i]; 
             zRayCast = self.findMeasurement(zK,x_t1);
             #print 'zRayCast=', zRayCast;
@@ -169,7 +172,7 @@ class SensorModel:
             p = self.zHit*pHit + self.zShort*pShort + self.zMax*pMax + self.zRand*pRand;
             
             #print 'p=',p;
-            q = q*(p); 
+            q = q+math.log(p); 
         
 
         return q    

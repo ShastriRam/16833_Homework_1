@@ -26,9 +26,9 @@ def visualize_map(occupancy_map,particles):
     #y = np.mean(y);
     plt.imshow(occupancy_map, cmap='Greys');
     plt.scatter(x,y,color='r',marker='.', s = 10); 
-    #plt.show(block=False)
-    plt.show()
-    time.sleep(1)
+    plt.show(block=False)
+    #plt.show()
+    time.sleep(3)
     plt.close()
 
 
@@ -130,7 +130,7 @@ def main():
     sensor_model = SensorModel(occupancy_map)
     resampler = Resampling()
 
-    num_particles = 500
+    num_particles = 10
     #particles = init_particles_random(num_particles, occupancy_map)
     particles = init_particles_freespace(num_particles, occupancy_map)
 
@@ -188,24 +188,43 @@ def main():
                 # w_t = 1/num_particles
                 particles_new[m,:] = np.hstack((newParticle, newParticleWeight))
             else:
-                particles_new[m,:] = np.hstack((newParticle, particles[m,3]))
+                continue
+                #particles_new[m,:] = np.hstack((newParticle, particles[m,3]))
         
         particles = particles_new
         lastState = currentState
+        
 
-        if vis_flag:
-            visualize_map(occupancy_map,particles)
+        
+        print '***********Particles before normalizing***************'
+        print(particles)
+        
+        #normalize the weights
+        minWeight = min(particles[:,3]);
+        maxWeight = max(particles[:,3]);
+        weightRng = (maxWeight - minWeight);
+        if (int(weightRng)==0):
+            particles[:,3] = (1/float(num_particles))*np.ones(num_particles);
+        else:
+            particles[:,3] = (particles[:,3] - minWeight)/weightRng;
+
+        print '***********Particles after normalizing***************'
+        print(particles)
+        
         """
         RESAMPLING
         """
         
-        #particles = resampler.low_variance_sampler(particles,num_particles)
-        particles = resampler.multinomial_sampler(particles, num_particles)
-        print(particles)
+        particles = resampler.low_variance_sampler(particles,num_particles)
+        #particles = resampler.multinomial_sampler(particles, num_particles)
+
 
 
         # if vis_flag:
         #     visualize_timestep(particles, time_idx)
+
+        if vis_flag:
+            visualize_map(occupancy_map,particles)
 
 if __name__=="__main__":
     main()
