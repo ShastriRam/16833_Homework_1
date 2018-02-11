@@ -169,27 +169,9 @@ def main():
         particles = particles_new
         lastState = currentState
                 
-<<<<<<< HEAD
-        #print '***********Particles before normalizing***************'
-        #print(particles)
-        
-        # #normalize the weights
-        # minWeight = min(particles[:,3]);
-        # maxWeight = max(particles[:,3]);
-        # weightRng = (maxWeight - minWeight);
-        # if (int(weightRng)==0):
-        #     particles[:,3] = (1/float(num_particles))*np.ones(num_particles);
-        # else:
-        #     particles[:,3] = (particles[:,3] - minWeight)/weightRng;
 
-        # #print '***********Particles after normalizing***************'
-        #print(particles)
-        
-        """
-        RESAMPLING
-=======
-        print '***********Particles before normalizing***************'
-        print(particles)
+        # print '***********Particles before normalizing***************'
+        # print(particles)
 
         """
         #normalize the weights
@@ -203,7 +185,7 @@ def main():
 
         print '***********Particles after normalizing***************'
         print(particles)
->>>>>>> ffa79d24bb5af3962d754a5c16633d02f5783bb3
+
         """
 
         #particles = resampler.low_variance_sampler(particles,num_particles)
