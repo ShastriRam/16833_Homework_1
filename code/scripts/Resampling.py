@@ -32,20 +32,15 @@ class Resampling:
         return newParticles
 
 
-<<<<<<< HEAD
-    def low_variance_sampler(self, particles, numberOfParticles):
-=======
+
     def low_variance_sampler(self, particles, numberOfParticles): # Rahul's version
->>>>>>> 10884bb1a11bd6a041d6e3be7adc45ac07b0a655
 
         #print '********In low variance sampler*********'
         """
         particles : [num_particles x 4] sized array containing [x, y, theta, weight] values for all particles
         particles_resampled : [num_particles x 4] sized array containing [x, y, theta, wt] values for resampled set of particles
         M is the number of particles
-        """
-<<<<<<< HEAD
-        
+        """        
         resampledParticles = []
 
         weightOffset = np.random.uniform(0,(1/float(numberOfParticles)))
@@ -71,33 +66,8 @@ class Resampling:
             resampledParticles.append(particles[particleIndex])
             
         resampledParticles = np.asarray(resampledParticles)
-        return resampledParticles
-       
-    """def low_variance_sampler(self, oldParticles, numberOfParticles):
-        
-        #oldParticles : [num_particles x 4] sized array containing [x, y, theta, weight] values for all particles
-        #particles_resampled : [num_particles x 4] sized array containing [x, y, theta, wt] values for resampled set of particles
-        #M is the number of oldParticles
-        
-=======
+        return resampledParticles       
 
-        resampledParticles = []
-        weightOffset = np.random.uniform(0,(1/float(numberOfParticles))) # gives a number that is between 0 and 1/M, which is the width between the even samples
-        cumulativeWeight = particles[0,3] # The weight for the first particle
-        #print(c)
-        particleIndex = 0   
-        for m in range(1,numberOfParticles+1): # m
-            sampleLocation = weightOffset + (m - 1) * (1/float(numberOfParticles))  
-            # Add the weights of the particles until they are greater than sampleLocation
-            while sampleLocation > cumulativeWeight:   
-                particleIndex = particleIndex + 1
-                cumulativeWeight = cumulativeWeight + particles[particleIndex,3]
-            #print (particleIndex)
-            resampledParticles.append(particles[particleIndex])
-        resampledParticles = np.asarray(resampledParticles)
-        return resampledParticles
-       
->>>>>>> 10884bb1a11bd6a041d6e3be7adc45ac07b0a655
 
 
     # def low_variance_sampler(self, oldParticles, numberOfDesiredParticles): # Jack's version
@@ -115,9 +85,6 @@ class Resampling:
     #                                                                     # the end of the old particles
     #     print("low variance sampler: average weight: %f" % averageWeightOfNewParticles)
 
-<<<<<<< HEAD
-        return newParticle"""
-=======
     #     # Initially set the sample location to be somewhere randomly within the space of one sample width
     #     currentSampleLocation = random.random() * averageWeightOfNewParticles 
 
@@ -138,7 +105,6 @@ class Resampling:
     #         currentSampleLocation += averageWeightOfNewParticles
 
     #     return newParticles
->>>>>>> 10884bb1a11bd6a041d6e3be7adc45ac07b0a655
 
 if __name__ == "__main__":
     pass

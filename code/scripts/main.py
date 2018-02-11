@@ -17,41 +17,13 @@ from time import sleep
 def visualize_map(occupancy_map,particles):
     x = particles[:,0]/10 
     y = particles[:,1]/10
-<<<<<<< HEAD
-    #x = np.mean(x);
-    #y = np.mean(y);
+
     plt.imshow(occupancy_map, cmap='Greys');
     plt.scatter(x,y,color='r',marker='.', s = 10); 
     plt.show(block=False)
     #plt.show()
     time.sleep(3)
     plt.close()
-=======
->>>>>>> 10884bb1a11bd6a041d6e3be7adc45ac07b0a655
-
-    #plt.figure(1)
-
-    # plt.clf()
-    # plt.cla()
-    # plt.gcf().clear()
-    plt.imshow(occupancy_map, cmap='Greys');  # Show the map
-    #plt.scatter(x,y,color='r',marker='.', s = 10); # Show the particles
-    plt.plot(x,y,'.r')  # Show the particles
-    plt.show(block=False)  # This keeps the plot open 
-    #plt.show()  #  This makes you close the plot before it continues
-    #plt.gcf().clear() 
-    time.sleep(1)
-    #plt.axes.axes.clear()
-
-    
-    plt.close()
-
-
-
-    
-
-
-
 
 
 def init_particles_freespace(num_particles, occupancy_map):
@@ -128,11 +100,8 @@ def main():
     sensor_model = SensorModel(occupancy_map)
     resampler = Resampling()
 
-<<<<<<< HEAD
     num_particles = 10
-=======
-    
->>>>>>> 10884bb1a11bd6a041d6e3be7adc45ac07b0a655
+
     #particles = init_particles_random(num_particles, occupancy_map)
     particles = init_particles_freespace(num_particles, occupancy_map)
 
@@ -193,21 +162,14 @@ def main():
                 # w_t = 1/num_particles
                 particles_new[m,:] = np.hstack((newParticle, newParticleWeight))
             else:
-<<<<<<< HEAD
                 continue
                 #particles_new[m,:] = np.hstack((newParticle, particles[m,3]))
-        
-=======
-                particles_new[m,:] = np.hstack((newParticle, particles[m,3]))
+
         print("Completed in  %s seconds" % (time.time() - startTime))  # this is currently taking about .4 seconds per particle
 
-
->>>>>>> 10884bb1a11bd6a041d6e3be7adc45ac07b0a655
         particles = particles_new
         lastState = currentState
-        
-
-        
+                
         print '***********Particles before normalizing***************'
         print(particles)
         
@@ -226,11 +188,7 @@ def main():
         """
         RESAMPLING
         """
-<<<<<<< HEAD
-        
-        particles = resampler.low_variance_sampler(particles,num_particles)
-        #particles = resampler.multinomial_sampler(particles, num_particles)
-=======
+
         print("Resampling the particles")
         startTime = time.time()
         # Adjust the particle weights to the range of 0 to 1
@@ -238,7 +196,6 @@ def main():
         maxWeight = max(particles[:,3])
         weightRange = maxWeight - minWeight
         particles[:,3] = (particles[:,3] - minWeight)/weightRange
->>>>>>> 10884bb1a11bd6a041d6e3be7adc45ac07b0a655
 
 
         particles = resampler.low_variance_sampler(particles,num_particles)
