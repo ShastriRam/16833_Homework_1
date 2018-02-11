@@ -4,7 +4,8 @@ import pdb
 
 from MapReader import MapReader
 from MotionModel import MotionModel
-from SensorModel2 import SensorModel
+#from SensorModel2 import SensorModel   #Shastri's version
+from SensorModel import SensorModel     # Jack's version
 from Resampling import Resampling
 
 from matplotlib import pyplot as plt
