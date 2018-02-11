@@ -12,10 +12,10 @@ class MotionModel:
     def __init__(self):
 
         #Initialize Motion Model parameters here
-        self.alpha_1 = 0.000;
+        self.alpha_1 = 0.0001;
         self.alpha_2 = 0.000;
         self.alpha_3 = 0.000;
-        self.alpha_4 = 0.000; 
+        self.alpha_4 = 0.0001; 
 
     def sample_normal(self, b_sq):
         b = math.sqrt(b_sq);

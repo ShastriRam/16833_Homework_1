@@ -24,7 +24,7 @@ class SensorModel:
         self.zRand = 0.05;
         self.sigmaHit = 5;
         self.lambdaShort = float(50);
-        self.maxRange = float(800);
+        self.maxRange = float(8000);
         self.distrShort = expon(scale=1/self.lambdaShort);
 
         self.occupancyMap = occupancy_map
@@ -155,12 +155,12 @@ class SensorModel:
         param[in] x_t1 : particle state belief [x, y, theta] at time t [world_frame]
         param[out] prob_zt1 : likelihood of a range scan zt1 at time t
         """
-        q = 0;
+        q = 1;
         for i in xrange(len(z_t1_arr)):
             zK = z_t1_arr[i]; 
             zRayCast = self.findMeasurement(zK,x_t1);
-            print 'zRayCast=', zRayCast;
-            print 'zK=',zK;
+            #print 'zRayCast=', zRayCast;
+            #print 'zK=',zK;
             pHit = self.probHit(zRayCast, zK);
             pShort =self.probShort(zRayCast, zK); 
             pMax = self.probMax(zK);
@@ -168,8 +168,8 @@ class SensorModel:
 
             p = self.zHit*pHit + self.zShort*pShort + self.zMax*pMax + self.zRand*pRand;
             
-            print 'p=',p;
-            q = q+math.log(p); 
+            #print 'p=',p;
+            q = q*(p); 
         
 
         return q    
