@@ -4,7 +4,7 @@ import pdb
 
 from MapReader import MapReader
 from MotionModel import MotionModel
-from SensorModel import SensorModel
+from SensorModel2 import SensorModel
 from Resampling import Resampling
 
 from matplotlib import pyplot as plt
@@ -30,26 +30,6 @@ def visualize_map(occupancy_map,particles):
     time.sleep(1)
     plt.close()
 
-# def visualize_map(occupancy_map,particles, i):
-    
-#     plt.figure(1); 
-#     x = particles[:,0]/10 
-#     y = particles[:,1]/10
-#     #for xx,yy in zip(x,y):
-#     #	circ = Circle((xx,yy),0.5)
-#     #	ax.add_patch(circ)
-
-
-#     #circ = Circle((x,y),5)
-#     #ax.add_patch(circ)
-#     #plt.show()
-#     #sleep(3)
-#     plt.imshow(occupancy_map, cmap='Greys'); 
-#     plt.scatter(x,y); 
-#     #plt.show(block=False)
-#     plt.show
-#     time.sleep(3)
-#     plt.close()
 
     
 
