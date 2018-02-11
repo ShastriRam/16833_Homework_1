@@ -15,48 +15,30 @@ import time
 from time import sleep
 
 def visualize_map(occupancy_map,particles):
-    plt.figure(1)
-    #ax.set_aspect('equal')
-    # plt.switch_backend('TkAgg')
-    #mng = plt.get_current_fig_manager();  # mng.resize(*mng.window.maxsize())
-    #plt.ion(); ax.imshow(occupancy_map, cmap='Greys'); ax.axis([0, 800, 0, 800]);
     x = particles[:,0]/10 
     y = particles[:,1]/10
-    #x = np.mean(x);
-    #y = np.mean(y);
-    plt.imshow(occupancy_map, cmap='Greys');
-    plt.scatter(x,y,color='r',marker='.', s = 10); 
-    #plt.show(block=False)
-    plt.show()
+
+    #plt.figure(1)
+
+    # plt.clf()
+    # plt.cla()
+    # plt.gcf().clear()
+    plt.imshow(occupancy_map, cmap='Greys');  # Show the map
+    #plt.scatter(x,y,color='r',marker='.', s = 10); # Show the particles
+    plt.plot(x,y,'.r')  # Show the particles
+    plt.show(block=False)  # This keeps the plot open 
+    #plt.show()  #  This makes you close the plot before it continues
+    #plt.gcf().clear() 
     time.sleep(1)
+    #plt.axes.axes.clear()
+
+    
     plt.close()
 
 
+
     
 
-# def visualize_timestep(particles, tstep):
-#     x_locs = particles[:,0]/10.0
-#     y_locs = particles[:,1]/10.0
-#     scat = plt.scatter(x_locs, y_locs, c='r', marker='o')
-#     plt.pause(0.00001)
-#     scat.remove()
-
-
-# def init_particles_random(num_particles, occupancy_map):
-
-#     # initialize [x, y, theta] positions in world_frame for all particles
-#     # (randomly across the map) 
-#     y0_vals = np.random.uniform( 0, 7000, (num_particles, 1) ) # Generate the 
-#     x0_vals = np.random.uniform( 3000, 7000, (num_particles, 1) )
-#     theta0_vals = np.random.uniform( -3.14, 3.14, (num_particles, 1) )
-
-#     # initialize weights for all particles
-#     w0_vals = np.ones( (num_particles,1), dtype=np.float64)
-#     w0_vals = w0_vals / num_particles
-
-#     particles_init = np.hstack((x0_vals,y0_vals,theta0_vals,w0_vals))
-    
-#     return particles_init
 
 
 
@@ -96,6 +78,7 @@ def init_particles_freespace(num_particles, occupancy_map):
     w0_vals = w0_vals / num_particles
     particles_init = np.hstack((x0_vals,y0_vals,theta0_vals,w0_vals))
     print("finished init_particles_freespace")
+    #startTime = time.time()
     print("Completed in  %s seconds" % (time.time() - startTime))
     return particles_init
 
@@ -116,6 +99,10 @@ def main():
     """
     Initialize Parameters
     """
+    ###########################################  SET THE NUMBER OF PARTICLES #####################################
+    num_particles = 5000
+    ###########################################  SET THE NUMBER OF PARTICLES #####################################
+
     src_path_map = '../data/map/wean.dat'
     src_path_log = '../data/log/robotdata1.log'
 
@@ -130,7 +117,7 @@ def main():
     sensor_model = SensorModel(occupancy_map)
     resampler = Resampling()
 
-    num_particles = 500
+    
     #particles = init_particles_random(num_particles, occupancy_map)
     particles = init_particles_freespace(num_particles, occupancy_map)
 
@@ -170,6 +157,9 @@ def main():
 
         particles_new = np.zeros( (num_particles,4), dtype=np.float64)
         currentState = state
+
+        print ("Moving the particles and finding the new weights")
+        startTime = time.time()
         for m in range(0, num_particles):
 
             """
@@ -189,7 +179,9 @@ def main():
                 particles_new[m,:] = np.hstack((newParticle, newParticleWeight))
             else:
                 particles_new[m,:] = np.hstack((newParticle, particles[m,3]))
-        
+        print("Completed in  %s seconds" % (time.time() - startTime))  # this is currently taking about .4 seconds per particle
+
+
         particles = particles_new
         lastState = currentState
 
@@ -198,14 +190,21 @@ def main():
         """
         RESAMPLING
         """
-        
-        #particles = resampler.low_variance_sampler(particles,num_particles)
-        particles = resampler.multinomial_sampler(particles, num_particles)
-        print(particles)
+        print("Resampling the particles")
+        startTime = time.time()
+        # Adjust the particle weights to the range of 0 to 1
+        minWeight = min(particles[:,3])
+        maxWeight = max(particles[:,3])
+        weightRange = maxWeight - minWeight
+        particles[:,3] = (particles[:,3] - minWeight)/weightRange
 
 
-        # if vis_flag:
-        #     visualize_timestep(particles, time_idx)
+        particles = resampler.low_variance_sampler(particles,num_particles)
+        #particles = resampler.multinomial_sampler(particles, num_particles)
+        #print(particles)
+        print("Completed in  %s seconds" % (time.time() - startTime))  # this is currently taking about .4 seconds per particle
+        # Resampling typically takes 8 ms for 5000 particles.
+
 
 if __name__=="__main__":
     main()

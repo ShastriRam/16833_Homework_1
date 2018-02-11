@@ -35,6 +35,7 @@ def main():
 
     particleMeasurement = 500
     probabilities = np.zeros(1000)
+
     index = 0;
     for actualMeasurement in range(1000):
         probabilities[index] = sensor_model.calculateProbability(actualMeasurement,particleMeasurement)
@@ -53,7 +54,17 @@ def main():
     expPDF = expon.pdf(x)
     #plotProbabilities(expPDF)
 
-    #print (expPDF)
+    # lambdaShort = 1
+    # distrShort = expon(scale=1/lambdaShort)
+    # expCurv = np.zeros(1000)
+    
+    # index = 0;
+    # for I in range (1000):
+    #     expCurv(I) = distrShort.pdf(I)
+
+    # plotProbabilities(expCurve)
+
+    # print (expPDF)
 
 if __name__=="__main__":
     main()
