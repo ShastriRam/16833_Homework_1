@@ -18,13 +18,24 @@ def visualize_map(occupancy_map,particles):
     x = particles[:,0]/10 
     y = particles[:,1]/10
 
+    fig = plt.figure(1);
+    ax = fig.add_subplot(111);
+    ax.imshow(occupancy_map, cmap='Greys');
+    ax.scatter(x,y,color='r',marker='.', s = 10);
+    fig.canvas.draw()
+    plt.show(block=False)
+    ax.clear()
+    """
+    plt.figure(1)
+    plt.ion()
     plt.imshow(occupancy_map, cmap='Greys');
     plt.scatter(x,y,color='r',marker='.', s = 10); 
     plt.show(block=False)
     #plt.show()
     time.sleep(1)
+    res.remove()
     plt.close()
-
+    """
 
 def init_particles_freespace(num_particles, occupancy_map):
 
@@ -178,19 +189,18 @@ def main():
         minWeight = min(particles[:,3]);
         maxWeight = max(particles[:,3]);
         weightRng = (maxWeight - minWeight);
-        if (abs(weightRng)<0.0001):
+        if (abs(weightRng)<0.0000001):
             particles[:,3] = (1/float(num_particles))*np.ones(num_particles);
         else:
-            particles[:,3] = (particles[:,3] - minWeight)/weightRng;
-
+        particles[:,3] = (particles[:,3] - minWeight)/weightRng;
+        """
+        
         print '***********Particles after normalizing***************'
         print(particles)
 
-        """
 
         #particles = resampler.low_variance_sampler(particles,num_particles)
         particles = resampler.multinomial_sampler(particles, num_particles)
-        #print(particles)
         print("Completed in  %s seconds" % (time.time() - startTime))  # this is currently taking about .4 seconds per particle
         # Resampling typically takes 8 ms for 5000 particles.
 
