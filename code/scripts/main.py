@@ -94,7 +94,7 @@ def main():
     Initialize Parameters
     """
     ###########################################  SET THE NUMBER OF PARTICLES #####################################
-    num_particles = 5
+    num_particles = 500
     ###########################################  SET THE NUMBER OF PARTICLES #####################################
 
     src_path_map = '../data/map/wean.dat'
@@ -112,9 +112,9 @@ def main():
     resampler = Resampling()
 
 
-    #particles = init_particles_random(num_particles, occupancy_map)
-    #particles = init_particles_freespace(num_particles, occupancy_map)
-    particles = np.array([[4100,3990,3,1],[4060,3990,3,1],[4000,3990,3,1],[4000,3990,2,1],[6150,1270,1.7,1]]) 
+
+    particles = init_particles_freespace(num_particles, occupancy_map)
+    #particles = np.array([[4100,3990,3,1],[4060,3990,3,1],[4000,3990,3,1],[4000,3990,2,1],[6150,1270,1.7,1]]) 
     # The particles above are
     # In the correct location with approximately the correct angle
     # Correct angle but a little farther out into the hallway
@@ -170,10 +170,11 @@ def main():
             """
             MOTION MODEL
             """
-            #oldParticle = particles[m, 0:3]
-            #newParticle = motion_model.update(lastState, currentState, oldParticle)
+            oldParticle = particles[m, 0:3]
+            newParticle = motion_model.update(lastState, currentState, oldParticle)
 
-            newParticle = particles[m,0:3] ######### Don't update the position of the particle.####################
+            # # Use this line for testing probabilities
+            # newParticle = particles[m,0:3] ######### Don't update the position of the particle.####################
 
             """
             SENSOR MODEL
