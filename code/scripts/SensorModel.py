@@ -80,7 +80,7 @@ class SensorModel:
         # * if that point is free space, it makes that the new minDistance
         # It stops when the distance between min and max is equal to 1 and 
         # it then returns the maxDistance
-        # For 10000 particles with angle increment of 5, this takes 8 to 9.5 seconds
+        # For 10000 particles with angle increment of 5, this takes 6.5 to 7.2 seconds
         maxDistance = 1000 # centimeters
         minDistance = 0
         
@@ -90,19 +90,21 @@ class SensorModel:
 
 
         stillWorking = True
+
         sinOfGlobalAngle = math.sin(globalAngleForBeam)
         cosOfGlobalAngle = math.cos(globalAngleForBeam)
+
         while stillWorking == True:
             distanceRange = maxDistance - minDistance
-            #print ("Distance range: %f" % distanceRange)
+            print ("Distance range: %f\tMax: %d\tMin: %d" % (distanceRange,maxDistance,minDistance))
             if distanceRange == 1:
                 stillWorking = False
             else:
                 # split the working range into two while keeping it an integer
                 midDistance = int(((maxDistance-minDistance)*.5)) + minDistance
                 #Find the pixel coordinates for that distance
-                midX = round((particleLocation[0] + midDistance * cosOfGlobalAngle)/10)
-                midY = round((particleLocation[1] + midDistance * sinOfGlobalAngle)/10)
+                midX = round((particleLocationX + (midDistance * cosOfGlobalAngle)/10))
+                midY = round((particleLocationY + (midDistance * sinOfGlobalAngle)/10))
 
                 # limit things to the map region
                 if midX > 799:
@@ -112,8 +114,8 @@ class SensorModel:
                 elif midY < 0:
                     midY = 0
 
-
-                if self.occupancyMap[int(midY/10),int(midX/10)] == 0: # occupied
+                
+                if self.occupancyMap[midY,midX] == 0: # occupied
                     maxDistance = midDistance
                 else:
                     minDistance = midDistance
@@ -305,13 +307,13 @@ class SensorModel:
             # calculate the particle's measurement for this angle 
             particleMeasurement = self.findMeasurement2(absoluteAngle, particleLocation) # Returns the measurement in cm
 
+            print (particleMeasurement)
+            # ######################### FOR TESTING ONLY - Laser lines ############################                   ############ REMOVE AFTER TESTING
+            X = particleMeasurement * math.cos(absoluteAngle) + particleX  # This value is in centimeters
+            Y = particleMeasurement * math.sin(absoluteAngle) + particleY
 
-            # # ######################### FOR TESTING ONLY - Laser lines ############################                   ############ REMOVE AFTER TESTING
-            # X = particleMeasurement * math.cos(absoluteAngle) + particleX  # This value is in centimeters
-            # Y = particleMeasurement * math.sin(absoluteAngle) + particleY
-
-            # self.rangeLines[I][:] = [particleX/10,particleY/10,X/10,Y/10] # all of the /10 are so it displays correctly on the map
-            # # ######################### FOR TESTING ONLY ############################                   ############ REMOVE AFTER TESTING
+            self.rangeLines[I][:] = [particleX/10,particleY/10,X/10,Y/10] # all of the /10 are so it displays correctly on the map
+            # ######################### FOR TESTING ONLY ############################                   ############ REMOVE AFTER TESTING
 
 
 

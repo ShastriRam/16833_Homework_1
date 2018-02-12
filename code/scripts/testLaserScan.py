@@ -27,7 +27,9 @@ def visualize_map(occupancy_map,vectorLaser):
     for i in range(0, len(x1)):
         plt.plot([x1[i],x2[i]],[y1[i], y2[i]], color='r', linestyle='-', linewidth=1)
     plt.show()
-    print (vectorLaser)
+    #print (vectorLaser)
+
+
 
     # # If vector laser is assigned with the EDGE LIST then this plots them.  
     # for i in range(0, len(vectorLaser)):
