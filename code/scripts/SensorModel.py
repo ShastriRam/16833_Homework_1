@@ -72,14 +72,67 @@ class SensorModel:
         self.rangeLines = np.zeros((180,4))
 
 
+    def findMeasurement2(self,globalAngleForBeam, particleLocation):
+        # This is a different version of the find measurement function
+        # The way that it works is to do a binary search where it repeatedly
+        # * finds a point 50% along the range that it is corrently examining
+        # * If that point is occupied, it makes that the new maxDistance
+        # * if that point is free space, it makes that the new minDistance
+        # It stops when the distance between min and max is equal to 1 and 
+        # it then returns the maxDistance
+        # For 10000 particles with angle increment of 5, this takes 8 to 9.5 seconds
+        maxDistance = 1000 # centimeters
+        minDistance = 0
+        
+
+        particleLocationX = int(round(particleLocation[0]/10)) # convert to decimeters
+        particleLocationY = int(round(particleLocation[1]/10))
+
+
+        stillWorking = True
+        sinOfGlobalAngle = math.sin(globalAngleForBeam)
+        cosOfGlobalAngle = math.cos(globalAngleForBeam)
+        while stillWorking == True:
+            distanceRange = maxDistance - minDistance
+            #print ("Distance range: %f" % distanceRange)
+            if distanceRange == 1:
+                stillWorking = False
+            else:
+                # split the working range into two while keeping it an integer
+                midDistance = int(((maxDistance-minDistance)*.5)) + minDistance
+                #Find the pixel coordinates for that distance
+                midX = round((particleLocation[0] + midDistance * cosOfGlobalAngle)/10)
+                midY = round((particleLocation[1] + midDistance * sinOfGlobalAngle)/10)
+
+                # limit things to the map region
+                if midX > 799:
+                    midX = 799
+                if midY > 799:
+                    midY = 799
+                elif midY < 0:
+                    midY = 0
+
+
+                if self.occupancyMap[int(midY/10),int(midX/10)] == 0: # occupied
+                    maxDistance = midDistance
+                else:
+                    minDistance = midDistance
+
+        return maxDistance
+
+
+
+
+
+
 
     def findMeasurement(self,globalAngleForBeam, particleLocation):
         # Given the direction that a distance is desired for and the location of the particle
         # returns the distance to the nearest non-traversable pixel in centimeters
         # globalAngleForBeam is given in radians
         # particleLocation is in centimeters
+        # For 10000 particles with angle increment of 5, this takes 8 to 9.2 seconds
 
-        # Do I need to worry about overrunning the edges of the map?
         maxDistance = 1000 # centimeters
 
         particleLocationX = int(round(particleLocation[0]/10)) # convert to decimeters
@@ -206,7 +259,7 @@ class SensorModel:
 
         ############################## KNOBS TO TURN #########################################
 
-        angleIncrement = 12; # The number of degrees to move when doing calculations.
+        angleIncrement = 5; # The number of degrees to move when doing calculations.
                             # 1 results in calculating every angle.
                             # 2 results in calculating every other angle.
 
@@ -233,6 +286,9 @@ class SensorModel:
 
         cumulativeProbability = 1  # use 0 if doing log probability
 
+        relativeAngle = -math.pi/2
+        angleAdder = (angleIncrement/180.0) * math.pi # added to the relative angle each time
+
         for I in range(0,180,angleIncrement): # calculate a range for all 180 measurements.  To reduce the number 
                                   # of distances calculated, make the last number something other than 1
                                   # 35 gives me beams at [0, 35, 70, 105, 140, 175]
@@ -240,16 +296,17 @@ class SensorModel:
                                   # 16 gives me beams at [0, 16, 32, 48, 64, 80, 96, 112, 128, 144, 160, 176]
 
             # Calculate the angle for this reading
-            relativeAngle = (float(I)/180)* math.pi # This is verified to be 0 -> pi
-            absoluteAngle =  particleAngle + relativeAngle - math.pi/2
+            #relativeAngle = (float(I)/180)* math.pi # This is verified to be 0 -> pi
+            #absoluteAngle =  particleAngle + relativeAngle - math.pi/2
+            absoluteAngle =  particleAngle + relativeAngle
 
 
 
             # calculate the particle's measurement for this angle 
-            particleMeasurement = self.findMeasurement(absoluteAngle, particleLocation) # Returns the measurement in cm
+            particleMeasurement = self.findMeasurement2(absoluteAngle, particleLocation) # Returns the measurement in cm
 
 
-            # # ######################### FOR TESTING ONLY ############################                   ############ REMOVE AFTER TESTING
+            # # ######################### FOR TESTING ONLY - Laser lines ############################                   ############ REMOVE AFTER TESTING
             # X = particleMeasurement * math.cos(absoluteAngle) + particleX  # This value is in centimeters
             # Y = particleMeasurement * math.sin(absoluteAngle) + particleY
 
@@ -267,13 +324,11 @@ class SensorModel:
 
             probability = self.calculateProbability(actualMeasurement, particleMeasurement)
 
-            
-
-
 
             # Now find the log value of the probability
             #cumulativeProbability += math.log(probability)
             cumulativeProbability *= probability
+            relativeAngle += angleAdder
 
         return cumulativeProbability   
  

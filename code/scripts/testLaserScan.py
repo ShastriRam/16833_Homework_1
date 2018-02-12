@@ -27,13 +27,16 @@ def visualize_map(occupancy_map,vectorLaser):
     for i in range(0, len(x1)):
         plt.plot([x1[i],x2[i]],[y1[i], y2[i]], color='r', linestyle='-', linewidth=1)
     plt.show()
+    print (vectorLaser)
 
-
-    # # If vector laser is assigned with the edge list then this plots them.  
+    # # If vector laser is assigned with the EDGE LIST then this plots them.  
     # for i in range(0, len(vectorLaser)):
     #     plt.plot(vectorLaser[i,0]/10, vectorLaser[i,1]/10,'r.')
     # plt.show()
 
+
+    # THE SECTION THAT ASSIGNS THE DATA FOR THE LASER LINES NEEDS TO BE UNCOMMENTED IN THE SENSOR
+    # MODEL FOR THIS CODE TO DRAW THE LINES.
 
     sleep(20)
 
@@ -56,9 +59,8 @@ def main():
     src_path_map = '../data/map/wean.dat'
     map_obj = MapReader(src_path_map)
     occupancy_map = map_obj.get_map()
-    print("testLaserScan.py: occupancyMap shape:")
-    print(occupancy_map.shape)
-    map_obj.makeEdgeList()
+
+    #map_obj.makeEdgeList()
     #edgeList = map_obj.edgeLocations
     #sensorObject = SensorModel(edgeList)
     sensorObject = SensorModel(occupancy_map)
@@ -67,6 +69,8 @@ def main():
     logProbability = sensorObject.beam_range_finder_model(z, x)
     vectorLaser = sensorObject.rangeLines
     visualize_map(occupancy_map,vectorLaser)
+
+
     #visualize_map(occupancy_map,edgeList)
 
 if __name__=="__main__":

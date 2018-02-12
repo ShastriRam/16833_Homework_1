@@ -96,7 +96,7 @@ def main():
     Initialize Parameters
     """
     ###########################################  SET THE NUMBER OF PARTICLES #####################################
-    num_particles = 1000
+    num_particles = 500
     ###########################################  SET THE NUMBER OF PARTICLES #####################################
 
     src_path_map = '../data/map/wean.dat'
@@ -176,34 +176,37 @@ def main():
             first_time_idx = False
             continue
 
-        #particles_new = np.zeros( (num_particles,4), dtype=np.float64)
+        particles_new = np.zeros( (num_particles,4), dtype=np.float64)
         currentState = state
 
-
-
-        # MOTION MODEL - move each particle
+        #print ("Moving the particles and finding the new weights")
         startTime = time.time()
-        for m in range(num_particles): 
+        for m in range(0, num_particles):
+
+            """
+            MOTION MODEL
+            """
             oldParticle = particles[m, 0:3]
-            particles[m, 0:3] = motion_model.update(lastState, currentState, oldParticle) # This is [X,Y,theta]
+            newParticle = motion_model.update(lastState, currentState, oldParticle)
+
             # # Use this line for testing probabilities
             # newParticle = particles[m,0:3] ######### Don't update the position of the particle.####################
-        print("Motion model completed in  %s seconds" % (time.time() - startTime))  # Typically takes .125 seconds for 
-                                                                                    # 10000 particles
 
-
-
-
-        # SENSOR MODEL - find the liklihood of each particle
-        startTime = time.time()
-        for m in range(num_particles): 
-            particles[m,3] = sensor_model.beam_range_finder_model(ranges, particles[m,0:3])
-        print("Sensor model completed in  %s seconds" % (time.time() - startTime)) # Typically takes 7.85 seconds for 
-                                                                                    # 10000 particles
+            """
+            SENSOR MODEL
+            """
+            if (meas_type == "L"): # Lidar data
+                newParticleWeight = sensor_model.beam_range_finder_model(ranges, newParticle)
+                particles_new[m,:] = np.hstack((newParticle, newParticleWeight))
+            else:
+                continue
                 
 
+        #print("Completed in  %s seconds" % (time.time() - startTime))  # this is currently taking about .4 milliseconds per particle
 
-
+        particles = particles_new
+        #print ("particles:")
+        #print (particles)
         lastState = currentState
                 
 
