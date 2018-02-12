@@ -26,7 +26,7 @@ def visualize_map(occupancy_map,particles):
     fig.canvas.draw()
     plt.show(block=False)
     ax.clear()
-    #time.sleep(1)
+    time.sleep(2)
     """
     plt.figure(1)
     plt.ion()
@@ -96,7 +96,7 @@ def main():
     Initialize Parameters
     """
     ###########################################  SET THE NUMBER OF PARTICLES #####################################
-    num_particles = 1000
+    num_particles = 10
     ###########################################  SET THE NUMBER OF PARTICLES #####################################
 
     src_path_map = '../data/map/wean.dat'
@@ -210,21 +210,20 @@ def main():
         # print '***********Particles before normalizing***************'
         # print(particles)
 
-        """
-        #normalize the weights
-        minWeight = min(particles[:,3]);
-        maxWeight = max(particles[:,3]);
-        weightRng = (maxWeight - minWeight);
-        if (abs(weightRng)<0.0000001):
-            particles[:,3] = (1/float(num_particles))*np.ones(num_particles);
-        else:
-        particles[:,3] = (particles[:,3] - minWeight)/weightRng;
-        """
+        
+        # #normalize the weights
+        # minWeight = min(particles[:,3]);
+        # maxWeight = max(particles[:,3]);
+        # weightRng = (maxWeight - minWeight);
+        # if (abs(weightRng)<0.0000001):
+        #     particles[:,3] = (1/float(num_particles))*np.ones(num_particles);
+        # else:
+        #     particles[:,3] = (particles[:,3] - minWeight)/weightRng;
+        
         
         #print '***********Particles after normalizing***************'
-        #print(particles)
-
-
+        #
+        print(particles)
         #particles = resampler.low_variance_sampler(particles,num_particles)
         particles = resampler.multinomial_sampler(particles, num_particles)
         #print("Completed in  %s seconds" % (time.time() - startTime))  # this is currently taking about .4 seconds per particle

@@ -22,7 +22,7 @@ def plotProbabilities(probabilities):
     plt.ion() 
     plt.plot(probabilities)
     plt.show()
-    sleep(10)
+    sleep(20)
 
 
 

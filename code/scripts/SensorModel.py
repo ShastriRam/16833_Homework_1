@@ -37,10 +37,11 @@ class SensorModel:
         ############################## KNOBS TO TURN #########################################
         # Adjust these to get an acceptable distribution.  The distribution is adjusted later
         # To get its sum to equal 1.
+        self.gaussianScaleFactor = .45
         self.stdev = 50   # Adjusts the width of the gaussian - stdev is this many samples wide
-        self.exponentialScaleFactor = .25   # The sum of the exponential curve that I am generating is ~21.6.  
+        self.exponentialScaleFactor = .15   # The sum of the exponential curve that I am generating is ~21.6.  
                                         # The values as initially generated range from .99 to .01
-        self.uniformValue = .05 # This is the value that is used in each bin for the uniform distribution
+        self.uniformValue = .75 # This is the value that is used in each bin for the uniform distribution
         ######################################################################################
 
         #self.edges = edgeList
@@ -54,7 +55,7 @@ class SensorModel:
 
         # Make the gaussian distribution
         self.gaussPDF = signal.gaussian(self.numSamples * 2,std=self.stdev) # We want this to be 2000 samples wide
-
+        self.gaussPDF *= self.gaussianScaleFactor
 
         # Resize the distributions to give them a second row.
         self.expPDF.resize(2,self.numSamples)
@@ -70,7 +71,7 @@ class SensorModel:
         self.uniformSum = self.uniformValue * self.numSamples
 
         self.rangeLines = np.zeros((180,4))
-
+        self.ranges = np.zeros(180)
 
 
     def findMeasurement3(self,globalAngleForBeam, particleLocation):
@@ -354,7 +355,7 @@ class SensorModel:
 
         ############################## KNOBS TO TURN #########################################
 
-        angleIncrement = 5; # The number of degrees to move when doing calculations.
+        angleIncrement = 1; # The number of degrees to move when doing calculations.
                             # 1 results in calculating every angle.
                             # 2 results in calculating every other angle.
 
@@ -401,12 +402,13 @@ class SensorModel:
             particleMeasurement = self.findMeasurement(absoluteAngle, particleLocation) # Returns the measurement in cm
 
             #print (particleMeasurement)
-            # ######################### FOR TESTING ONLY - Laser lines ############################                   ############ REMOVE AFTER TESTING
-            X = particleMeasurement * math.cos(absoluteAngle) + particleX  # This value is in centimeters
-            Y = particleMeasurement * math.sin(absoluteAngle) + particleY
-
-            self.rangeLines[I][:] = [particleX/10,particleY/10,X/10,Y/10] # all of the /10 are so it displays correctly on the map
-            # ######################### FOR TESTING ONLY ############################                   ############ REMOVE AFTER TESTING
+            # # ######################### FOR TESTING ONLY - Laser lines ############################                   ############ REMOVE AFTER TESTING
+            # X = particleMeasurement * math.cos(absoluteAngle) + particleX  # This value is in centimeters
+            # Y = particleMeasurement * math.sin(absoluteAngle) + particleY
+            # self.rangeLines[I][:] = [particleX/10,particleY/10,X/10,Y/10] # all of the /10 are so it displays correctly on the map
+            
+            # self.ranges[I] = int(particleMeasurement)
+            # # ######################### FOR TESTING ONLY ############################                   ############ REMOVE AFTER TESTING
 
 
 
