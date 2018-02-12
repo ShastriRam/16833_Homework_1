@@ -72,6 +72,99 @@ class SensorModel:
         self.rangeLines = np.zeros((180,4))
 
 
+
+    def findMeasurement3(self,globalAngleForBeam, particleLocation):
+        # This is a different version of the find measurement function
+        # It starts out by moving outward from 0 in 32cm increments until it hits an 
+        # obstruction then it does something like a binary search for the rest
+        
+        # At each step, it will test to see if there is an obstruction.  If so then it
+        # will keep going otherwise it will reverse direction and cut the step size in two
+        # It will terminate when the step size is 1
+
+        # 
+
+        # For 10000 particles with angle increment of 5, this takes ___ to ___ seconds
+        maxDistance = 1000 # centimeters
+        currentDistance = 0
+        stepSize = 32
+        
+
+        particleLocationX = int(round(particleLocation[0]/10)) # convert to decimeters
+        particleLocationY = int(round(particleLocation[1]/10))
+
+
+        stillWorking = True
+        hitMaximumDistance = False
+
+        sinOfGlobalAngle = math.sin(globalAngleForBeam)
+        cosOfGlobalAngle = math.cos(globalAngleForBeam)
+
+        # moveOutward until it hits an obstruction or goes over the maximum distance
+        while stillWorking == True:
+            currentDistance += stepSize
+            if currentDistance > 1000:
+                stillWorking = False
+
+            # Calculate the X and Y coordinates for this point
+            X = int(round((particleLocationX + (currentDistance * cosOfGlobalAngle)/10)))
+            Y = int(round((particleLocationY + (currentDistance * sinOfGlobalAngle)/10)))
+            # limit things to the map region
+            if X > 799:
+                X = 799
+            if Y > 799:
+                Y = 799
+            elif Y < 0:
+                Y = 0
+
+            if self.occupancyMap[Y,X] == 0: # occupied
+                stillWorking = False
+                
+
+        if hitMaximumDistance == True:
+            return 1000
+
+        # Now keep reversing direction until it finds the edge
+        searchingForFreeSpace = True
+        stepSize *= -.5
+        while abs(stepSize) != 1:
+            currentDistance += stepSize
+            print ("StepSize: %f"%stepSize)
+
+            # Calculate the X and Y coordinates for this point
+            X = int(round((particleLocationX + (currentDistance * cosOfGlobalAngle)/10)))
+            Y = int(round((particleLocationY + (currentDistance * sinOfGlobalAngle)/10)))
+            # limit things to the map region
+            if X > 799:
+                X = 799
+            if Y > 799:
+                Y = 799
+            elif Y < 0:
+                Y = 0
+
+            pixVal = self.occupancyMap[Y,X]
+
+            if searchingForFreeSpace == True:
+                if pixVal == 1:
+                    stepSize *= -.5
+                    searchingForFreeSpace = False
+            else:
+                if pixVal == 0:
+                    stepSize *= -.5
+                    searchingForFreeSpace = True
+
+        #print("Finished")
+
+        return currentDistance
+
+
+
+
+
+
+
+
+
     def findMeasurement2(self,globalAngleForBeam, particleLocation):
         # This is a different version of the find measurement function
         # The way that it works is to do a binary search where it repeatedly
@@ -305,9 +398,9 @@ class SensorModel:
 
 
             # calculate the particle's measurement for this angle 
-            particleMeasurement = self.findMeasurement2(absoluteAngle, particleLocation) # Returns the measurement in cm
+            particleMeasurement = self.findMeasurement(absoluteAngle, particleLocation) # Returns the measurement in cm
 
-            print (particleMeasurement)
+            #print (particleMeasurement)
             # ######################### FOR TESTING ONLY - Laser lines ############################                   ############ REMOVE AFTER TESTING
             X = particleMeasurement * math.cos(absoluteAngle) + particleX  # This value is in centimeters
             Y = particleMeasurement * math.sin(absoluteAngle) + particleY
