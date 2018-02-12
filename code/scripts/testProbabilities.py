@@ -3,7 +3,7 @@ import sys
 
 from MapReader import MapReader
 from MotionModel import MotionModel
-from SensorModel2 import SensorModel
+from SensorModel import SensorModel
 from Resampling import Resampling
 
 from matplotlib import pyplot as plt

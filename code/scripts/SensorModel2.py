@@ -19,10 +19,10 @@ class SensorModel:
     def __init__(self, occupancy_map):
 
         # Weights for the various distributions
-        self.zHit = 20
-        self.zShort = 8
-        self.zMax = 1
-        self.zRand = 30.0;
+        self.zHit = 200 # 20
+        self.zShort = 80 #8
+        self.zMax = 10   #1 
+        self.zRand = 300.0 #30
 
         self.sigmaHit = 50 # stdev of the gaussian
         self.lambdaShort = .005; # Adjusts the exponential
@@ -183,7 +183,7 @@ class SensorModel:
             zK = z_t1_arr[i]; 
             zRayCast = self.findMeasurement(zK,x_t1);
 
-            p = calculateProbability(zK,zRayCast)
+            p = self.calculateProbability(zK,zRayCast)
             
             #print 'p=',p;
             q = q+math.log(p); 
