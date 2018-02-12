@@ -20,13 +20,16 @@ def visualize_map(occupancy_map,particles):
     y = particles[:,1]/10
 
     fig = plt.figure(1);
+    # mng = plt.get_current_fig_manager(); 
+    # mng.resize(*mng.window.maxsize())
     ax = fig.add_subplot(111);
-    ax.imshow(occupancy_map, cmap='Greys');
+    
     ax.scatter(x,y,color='r',marker='.', s = 10);
+    ax.imshow(occupancy_map, cmap='Greys');
     fig.canvas.draw()
     plt.show(block=False)
     ax.clear()
-    time.sleep(2)
+    #time.sleep(2)
     """
     plt.figure(1)
     plt.ion()
@@ -55,8 +58,12 @@ def init_particles_freespace(num_particles, occupancy_map):
         stillWorking = True
         while stillWorking == True:
             # Generate a particle location
+            # Initial position:  4130, 4000.0, 3.05
+            # X = np.random.uniform( 4030, 4230)
+            # Y = np.random.uniform( 3900, 4100)
             X = np.random.uniform( 3300, 7000)
             Y = np.random.uniform( 0, 7500)
+
 
             # Check to see if this is in free space or not
             Xx = int(X/10) # Convert from cm to dm
@@ -96,7 +103,7 @@ def main():
     Initialize Parameters
     """
     ###########################################  SET THE NUMBER OF PARTICLES #####################################
-    num_particles = 10
+    num_particles = 300
     ###########################################  SET THE NUMBER OF PARTICLES #####################################
 
     src_path_map = '../data/map/wean.dat'
@@ -223,7 +230,7 @@ def main():
         
         #print '***********Particles after normalizing***************'
         #
-        print(particles)
+        #print(particles)
         #particles = resampler.low_variance_sampler(particles,num_particles)
         particles = resampler.multinomial_sampler(particles, num_particles)
         #print("Completed in  %s seconds" % (time.time() - startTime))  # this is currently taking about .4 seconds per particle

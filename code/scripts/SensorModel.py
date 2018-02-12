@@ -355,7 +355,7 @@ class SensorModel:
 
         ############################## KNOBS TO TURN #########################################
 
-        angleIncrement = 1; # The number of degrees to move when doing calculations.
+        angleIncrement = 4; # The number of degrees to move when doing calculations.
                             # 1 results in calculating every angle.
                             # 2 results in calculating every other angle.
 

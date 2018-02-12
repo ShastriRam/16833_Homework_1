@@ -12,10 +12,10 @@ class MotionModel:
     def __init__(self):
 
         #Initialize Motion Model parameters here
-        self.alpha_1 = 0.001;
-        self.alpha_2 = 0.001;
-        self.alpha_3 = 0.001;
-        self.alpha_4 = 0.001; 
+        self.alpha_1 = 0.0003; #rotation        
+        self.alpha_2 = 0.0001; #translation
+        self.alpha_3 = 0.0001; #translation
+        self.alpha_4 = 0.0003; #rotation
 
     def sample_normal(self, b_sq):
         b = math.sqrt(b_sq);
@@ -50,21 +50,27 @@ class MotionModel:
         pose_y = x_t0[1];
         pose_theta = x_t0[2]; 
 
-        delta_rot_1 = math.atan2(y_odom_1-y_odom_0, x_odom_1-x_odom_0 - theta_odom_0);
+        delta_rot_1 = math.atan2(y_odom_1-y_odom_0, x_odom_1-x_odom_0)- theta_odom_0;
+
         delta_trans = math.sqrt( (x_odom_0-x_odom_1)*(x_odom_0-x_odom_1) +
-                                 (y_odom_0-y_odom_1)*(y_odom_0-y_odom_1));
+                                 (y_odom_0-y_odom_1)*(y_odom_0-y_odom_1) );
+
         delta_rot_2 = theta_odom_1 - theta_odom_0 - delta_rot_1;
 
         delta_rot_1_prime = delta_rot_1 - self.sample_normal(self.alpha_1*pow(delta_rot_1,2) +
                                                              self.alpha_2*pow(delta_trans,2));
+
         delta_trans_prime = delta_trans - self.sample_normal(self.alpha_3*pow(delta_trans,2) +
                                                              self.alpha_4*pow(delta_rot_1,2) +
                                                              self.alpha_4*pow(delta_rot_2,2));
+
         delta_rot_2_prime = delta_rot_2 - self.sample_normal(self.alpha_1*pow(delta_rot_2,2) +
                                                              self.alpha_2*pow(delta_trans,2));
 
         x_prime = pose_x + delta_trans_prime*math.cos(pose_theta+delta_rot_1_prime);
+
         y_prime = pose_y + delta_trans_prime*math.sin(pose_theta+delta_rot_1_prime);
+        
         theta_prime = pose_theta + delta_rot_1_prime + delta_rot_2_prime;
 
         x_t1 = np.array([x_prime, y_prime, theta_prime]);  

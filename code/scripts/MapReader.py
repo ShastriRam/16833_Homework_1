@@ -20,7 +20,7 @@ class MapReader:
         self._occupancy_map[self._occupancy_map < 0] = -1
         #self._occupancy_map[self._occupancy_map > 0] = 1 - self._occupancy_map[self._occupancy_map > 0] # invert the map
         self._occupancy_map = f(self._occupancy_map)  # convert the map into 0 or 1 where 1 indicates a traverable area
-        #self._occupancy_map = np.flipud(self._occupancy_map)
+        self._occupancy_map = np.flipud(self._occupancy_map)
 
         # Find the edges   1 indicates an edge.
         kernel = np.array([[0,1,0],[1,1,1],[0,1,0]])
