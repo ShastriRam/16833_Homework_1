@@ -4,8 +4,8 @@ import pdb
 
 from MapReader import MapReader
 from MotionModel import MotionModel
-from SensorModel2 import SensorModel   #Shastri's version
-#from SensorModel import SensorModel     # Jack's version
+#from SensorModel2 import SensorModel   #Shastri's version
+from SensorModel import SensorModel     # Jack's version
 from Resampling import Resampling
 
 from matplotlib import pyplot as plt
@@ -83,7 +83,7 @@ def main():
     Initialize Parameters
     """
     ###########################################  SET THE NUMBER OF PARTICLES #####################################
-    num_particles = 500
+    num_particles = 5
     ###########################################  SET THE NUMBER OF PARTICLES #####################################
 
     src_path_map = '../data/map/wean.dat'
@@ -102,7 +102,15 @@ def main():
 
 
     #particles = init_particles_random(num_particles, occupancy_map)
-    particles = init_particles_freespace(num_particles, occupancy_map)
+    #particles = init_particles_freespace(num_particles, occupancy_map)
+    particles = np.array([[4100,3990,3,1],[4060,3990,3,1],[4000,3990,3,1],[4000,3990,2,1],[6150,1270,1.7,1]]) 
+    # The particles above are
+    # In the correct location with approximately the correct angle
+    # Correct angle but a little farther out into the hallway
+    # Correct angle but squarely in the hallway
+    # In the center of the hallway and at wrong angle
+    # Completely wrong in the big room at the bottom
+
 
        
     vis_flag = 1
@@ -130,7 +138,10 @@ def main():
              odometry_laser = meas_vals[3:6] # [x, y, theta] coordinates of laser in odometry frame
              ranges = meas_vals[6:-1] # 180 range measurement values from single laser scan
         else: 
-            continue    # skipping Odometry reading
+            print("Skipping this record because it is an odometry record.")
+            continue    
+
+
         print "Processing time step " + str(time_idx) + " at time " + str(time_stamp) + "s"
 
         if (first_time_idx):
@@ -148,25 +159,26 @@ def main():
             """
             MOTION MODEL
             """
-            oldParticle = particles[m, 0:3]
-            newParticle = motion_model.update(lastState, currentState, oldParticle)
+            #oldParticle = particles[m, 0:3]
+            #newParticle = motion_model.update(lastState, currentState, oldParticle)
+
+            newParticle = particles[m,0:3] ######### Don't update the position of the particle.####################
 
             """
             SENSOR MODEL
             """
-            if (meas_type == "L"):
-                #z_t = ranges
-                #w_t = sensor_model.beam_range_finder_model(z_t, newParticle)
+            if (meas_type == "L"): # Lidar data
                 newParticleWeight = sensor_model.beam_range_finder_model(ranges, newParticle)
-                # w_t = 1/num_particles
                 particles_new[m,:] = np.hstack((newParticle, newParticleWeight))
             else:
                 continue
-                #particles_new[m,:] = np.hstack((newParticle, particles[m,3]))
+                
 
-        print("Completed in  %s seconds" % (time.time() - startTime))  # this is currently taking about .4 seconds per particle
+        print("Completed in  %s seconds" % (time.time() - startTime))  # this is currently taking about .4 milliseconds per particle
 
         particles = particles_new
+        print ("particles:")
+        print (particles)
         lastState = currentState
                 
 
