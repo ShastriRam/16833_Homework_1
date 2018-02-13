@@ -23,7 +23,7 @@ def visualize_map(occupancy_map,particles):
     plt.scatter(x,y,color='r',marker='.', s = 10); 
     plt.show(block=False)
     #plt.show()
-    time.sleep(1)
+    time.sleep(.05)
     plt.close()
 
 
@@ -35,7 +35,7 @@ def main():
 
 
     src_path_map = '../data/map/wean.dat'
-    src_path_log = '../data/log/robotdata1.log'
+    src_path_log = '../data/log/robotdata5.log'
 
     logfile = open(src_path_log, 'r')
 
@@ -60,6 +60,7 @@ def main():
         if (meas_type == "L"):  # Laser data
              odometry_laser = meas_vals[3:6] # [x, y, theta] coordinates of laser in odometry frame
              ranges = meas_vals[6:-1] # 180 range measurement values from single laser scan
+             ranges[ranges > 2500] = 0 
         else: 
             #print("Skipping this record because it is an odometry record.")
             continue    

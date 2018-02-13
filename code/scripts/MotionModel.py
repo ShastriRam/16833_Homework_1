@@ -17,10 +17,12 @@ class MotionModel:
         # self.alpha_3 = 0.00001; #translation
         # self.alpha_4 = 0.00003; #rotation
 
+
         self.alpha_1 = 0.0005; #rotation        
         self.alpha_2 = 0.00005; #translation
         self.alpha_3 = 0.00005; #translation
         self.alpha_4 = 0.0005; #rotation
+
 
     def sample_normal(self, b_sq):
         b = math.sqrt(b_sq);
