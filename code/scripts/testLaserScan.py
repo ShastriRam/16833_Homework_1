@@ -79,7 +79,8 @@ def main():
     #x = np.array([4100.0, 4800.0, -1.342158]) # In hallway above room in upper map
     #x = np.array([4700.0, 900.0, -1.342158])  # bottom left corner of map
 
-    x = np.array([4130, 4000.0, 3.05])   # very close to correct location 
+    #x = np.array([4130, 4000.0, 3.05])   # very close to correct location 
+    x = np.array([4050, 4000.0, 1.7])   # very close to correct location 
 
     
 
@@ -108,7 +109,7 @@ def main():
     print(sensorObject.ranges)
     print("LIDAR")
     print(z)
-    visualizeRanges(z,sensorObject.ranges)
+    #visualizeRanges(z,sensorObject.ranges)
 
 
     particleX = x[0]
@@ -123,7 +124,7 @@ def main():
         Y = z[I] * math.sin(absoluteAngle) + particleY
         rangeLines[I][:] = [particleX/10,particleY/10,X/10,Y/10] # all of the /10 are so it displays correctly on the map
      
-
+    visualize_map(occupancy_map,vectorLaser)
     #visualizeMapWithLidar(occupancy_map,vectorLaser,rangeLines)       
 
 

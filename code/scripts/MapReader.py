@@ -7,8 +7,10 @@ import scipy.ndimage as ndimage
 
 
 def f(x):
-    return 1 if x > .95 else 0 # This gives an image where it is 1 if it is free space and 0 
+    #return 1 if ((x > .95) | ((x>0) &(x<.1))) else 0 # This gives an image where it is 1 if it is free space and 0 
     #                          # if you can't be there.  .95 seems to be the ideal threshold 
+    return 1 if (x > .95)  else 0
+
 
 f = np.vectorize(f)  
 
@@ -89,9 +91,9 @@ class MapReader:
         # This code is confirmed to be good.   It is outputting the edge locations in centimeters.  
 
         # Sum all of the pixels in the map.  This gives me a count of all of the edge pixels.
-        # values, counts = np.unique(self.edges, return_counts=True)
-        # numberOfEdgePixels = counts[1]
-        # print('Number of edge pixels: ', numberOfEdgePixels)
+        values, counts = np.unique(self._occupancy_map, return_counts=True)
+        numberOfEdgePixels = counts[1]
+        print('Number of free space pixels: ', numberOfEdgePixels)
 
 
         x,y = np.nonzero(self.edges)

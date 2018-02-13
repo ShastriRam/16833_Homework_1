@@ -15,7 +15,7 @@ import time
 from time import sleep
 import math
 
-def visualize_map(occupancy_map,particles):
+def visualize_map(occupancy_map,particles,imageNumber):
     x = particles[:,0]/10 
     y = particles[:,1]/10
 
@@ -28,7 +28,11 @@ def visualize_map(occupancy_map,particles):
     ax.imshow(occupancy_map, cmap='Greys');
     fig.canvas.draw()
     plt.show(block=False)
+    
+    fileName = 'Renders/working%04d.png' % imageNumber
+    plt.savefig(fileName)
     ax.clear()
+
     #time.sleep(2)
     """
     plt.figure(1)
@@ -59,11 +63,26 @@ def init_particles_freespace(num_particles, occupancy_map):
         while stillWorking == True:
             # Generate a particle location
             # Initial position:  4130, 4000.0, 3.05
-            # X = np.random.uniform( 4030, 4230)
-            # Y = np.random.uniform( 3900, 4100)
-            X = np.random.uniform( 3300, 7000)
-            Y = np.random.uniform( 0, 7500)
 
+            initializeOverWholeMap = 1
+
+            if initializeOverWholeMap == 0:         # Tight rectangle around start point
+                X = np.random.uniform( 4030, 4230)
+                Y = np.random.uniform( 3900, 4100)
+            elif initializeOverWholeMap == 1:       # The whole map
+                X = np.random.uniform( 3300, 7000)
+                Y = np.random.uniform( 0, 7500)
+            elif initializeOverWholeMap == 2:       # Wider area around start point
+                X = np.random.uniform( 3700, 4500)
+                Y = np.random.uniform( 3700, 4300)
+            elif initializeOverWholeMap == 3:       # hybrid where there are a lot of particles at the start point
+                choose = np.random.uniform(0,20)
+                if choose > 18:
+                    X = np.random.uniform( 4000, 4270) # right around the start point
+                    Y = np.random.uniform( 3850, 4150)
+                else:
+                    X = np.random.uniform( 3300, 7000) # whole map
+                    Y = np.random.uniform( 0, 7500)
 
             # Check to see if this is in free space or not
             Xx = int(X/10) # Convert from cm to dm
@@ -103,7 +122,7 @@ def main():
     Initialize Parameters
     """
     ###########################################  SET THE NUMBER OF PARTICLES #####################################
-    num_particles = 300
+    num_particles = 10000
     ###########################################  SET THE NUMBER OF PARTICLES #####################################
 
     src_path_map = '../data/map/wean.dat'
@@ -140,6 +159,8 @@ def main():
     """
     first_time_idx = True
     lastUsedOdometry = np.array([0,0,0])
+    imageNumber = 0
+
     for time_idx, line in enumerate(logfile):
         # time_idx is just a counter
         # line is the text from a line in the file.
@@ -162,7 +183,8 @@ def main():
              distance = math.sqrt(delta[0]*delta[0] + delta[1] * delta[1])
              
 
-             if ((distance < 3) and (delta[2] < .01)): # Don't update or do anything if the robot is stationary
+             # Don't update if it didn't move
+             if ((distance < 35) and (delta[2] < .05)): # Don't update or do anything if the robot is stationary
                 print("Time: %f\tDistance: %f\tangle: %f\tDidn't move enough..."%(time_stamp,distance,delta[2]))
                 continue
 
@@ -233,12 +255,14 @@ def main():
         #print(particles)
         #particles = resampler.low_variance_sampler(particles,num_particles)
         particles = resampler.multinomial_sampler(particles, num_particles)
+
         #print("Completed in  %s seconds" % (time.time() - startTime))  # this is currently taking about .4 seconds per particle
         # Resampling typically takes 8 ms for 5000 particles.
 
 
         if vis_flag:
-            visualize_map(occupancy_map,particles)
+            imageNumber += 1
+            visualize_map(occupancy_map,particles,imageNumber)
 
 if __name__=="__main__":
     main()

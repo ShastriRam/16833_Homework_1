@@ -37,17 +37,34 @@ class SensorModel:
         ############################## KNOBS TO TURN #########################################
         # Adjust these to get an acceptable distribution.  The distribution is adjusted later
         # To get its sum to equal 1.
-        self.gaussianScaleFactor = .45
-        self.stdev = 50   # Adjusts the width of the gaussian - stdev is this many samples wide
-        self.exponentialScaleFactor = .15   # The sum of the exponential curve that I am generating is ~21.6.  
-                                        # The values as initially generated range from .99 to .01
-        self.uniformValue = .75 # This is the value that is used in each bin for the uniform distribution
+        # self.gaussianScaleFactor = .45
+        # self.stdev = 50   # Adjusts the width of the gaussian - stdev is this many samples wide
+        # self.exponentialScaleFactor = .15   # The sum of the exponential curve that I am generating is ~21.6.  
+        #                                 # The values as initially generated range from .99 to .01
+        # self.uniformValue = .75 # This is the value that is used in each bin for the uniform distribution
+
+        # self.gaussianScaleFactor = .65
+        # self.stdev = 15   
+        # self.exponentialScaleFactor = .15   
+        # self.uniformValue = .75 
+
+        self.maxDistance = 2500 # centimeters  (25 meters)
+
+        self.gaussianScaleFactor = .35
+        self.stdev = 7   
+        self.exponentialScaleFactor = .07   
+        self.uniformValue = .75 
+
+
+        # By making stdev be lower, it no-longer liked the big open area.   
+        #   stdev of 50 liked the open area
+        #   stdev of 20 converged to a hallway corner at least.
         ######################################################################################
 
         #self.edges = edgeList
         self.occupancyMap = occupancy_map
 
-        self.numSamples = 1000 # This should be 1000 since our max range is 10m and the divisions are in 10cm units.
+        self.numSamples = self.maxDistance  
 
         x = np.linspace(expon.ppf(0.01), expon.ppf(0.99), self.numSamples) # Makes numSamples samples with a probability ranging from .99 to .1
         self.expPDF = expon.pdf(x)
@@ -74,91 +91,89 @@ class SensorModel:
         self.ranges = np.zeros(180)
 
 
-    def findMeasurement3(self,globalAngleForBeam, particleLocation):
-        # This is a different version of the find measurement function
-        # It starts out by moving outward from 0 in 32cm increments until it hits an 
-        # obstruction then it does something like a binary search for the rest
+    # def findMeasurement3(self,globalAngleForBeam, particleLocation):
+    #     # This is a different version of the find measurement function
+    #     # It starts out by moving outward from 0 in 32cm increments until it hits an 
+    #     # obstruction then it does something like a binary search for the rest
         
-        # At each step, it will test to see if there is an obstruction.  If so then it
-        # will keep going otherwise it will reverse direction and cut the step size in two
-        # It will terminate when the step size is 1
+    #     # At each step, it will test to see if there is an obstruction.  If so then it
+    #     # will keep going otherwise it will reverse direction and cut the step size in two
+    #     # It will terminate when the step size is 1
 
-        # 
+    #     # 
 
-        # For 10000 particles with angle increment of 5, this takes ___ to ___ seconds
-        maxDistance = 1000 # centimeters
-        currentDistance = 0
-        stepSize = 32
+    #     # For 10000 particles with angle increment of 5, this takes ___ to ___ seconds
+    #     #maxDistance = 1000 # centimeters
+    #     currentDistance = 0
+    #     stepSize = 32
         
 
-        particleLocationX = int(round(particleLocation[0]/10)) # convert to decimeters
-        particleLocationY = int(round(particleLocation[1]/10))
+    #     particleLocationX = int(round(particleLocation[0]/10)) # convert to decimeters
+    #     particleLocationY = int(round(particleLocation[1]/10))
 
 
-        stillWorking = True
-        hitMaximumDistance = False
+    #     stillWorking = True
+    #     hitMaximumDistance = False
 
-        sinOfGlobalAngle = math.sin(globalAngleForBeam)
-        cosOfGlobalAngle = math.cos(globalAngleForBeam)
+    #     sinOfGlobalAngle = math.sin(globalAngleForBeam)
+    #     cosOfGlobalAngle = math.cos(globalAngleForBeam)
 
-        # moveOutward until it hits an obstruction or goes over the maximum distance
-        while stillWorking == True:
-            currentDistance += stepSize
-            if currentDistance > 1000:
-                stillWorking = False
+    #     # moveOutward until it hits an obstruction or goes over the maximum distance
+    #     while stillWorking == True:
+    #         currentDistance += stepSize
+    #         if currentDistance > 1000:
+    #             stillWorking = False
 
-            # Calculate the X and Y coordinates for this point
-            X = int(round((particleLocationX + (currentDistance * cosOfGlobalAngle)/10)))
-            Y = int(round((particleLocationY + (currentDistance * sinOfGlobalAngle)/10)))
-            # limit things to the map region
-            if X > 799:
-                X = 799
-            if Y > 799:
-                Y = 799
-            elif Y < 0:
-                Y = 0
+    #         # Calculate the X and Y coordinates for this point
+    #         X = int(round((particleLocationX + (currentDistance * cosOfGlobalAngle)/10)))
+    #         Y = int(round((particleLocationY + (currentDistance * sinOfGlobalAngle)/10)))
+    #         # limit things to the map region
+    #         if X > 799:
+    #             X = 799
+    #         if Y > 799:
+    #             Y = 799
+    #         elif Y < 0:
+    #             Y = 0
 
-            if self.occupancyMap[Y,X] == 0: # occupied
-                stillWorking = False
+    #         if self.occupancyMap[Y,X] == 0: # occupied
+    #             stillWorking = False
                 
 
-        if hitMaximumDistance == True:
-            return 1000
+    #     if hitMaximumDistance == True:
+    #         return 1000
 
-        # Now keep reversing direction until it finds the edge
-        searchingForFreeSpace = True
-        stepSize *= -.5
-        while abs(stepSize) != 1:
-            currentDistance += stepSize
-            print ("StepSize: %f"%stepSize)
+    #     # Now keep reversing direction until it finds the edge
+    #     searchingForFreeSpace = True
+    #     stepSize *= -.5
+    #     while abs(stepSize) != 1:
+    #         currentDistance += stepSize
+    #         print ("StepSize: %f"%stepSize)
 
-            # Calculate the X and Y coordinates for this point
-            X = int(round((particleLocationX + (currentDistance * cosOfGlobalAngle)/10)))
-            Y = int(round((particleLocationY + (currentDistance * sinOfGlobalAngle)/10)))
-            # limit things to the map region
-            if X > 799:
-                X = 799
-            if Y > 799:
-                Y = 799
-            elif Y < 0:
-                Y = 0
+    #         # Calculate the X and Y coordinates for this point
+    #         X = int(round((particleLocationX + (currentDistance * cosOfGlobalAngle)/10)))
+    #         Y = int(round((particleLocationY + (currentDistance * sinOfGlobalAngle)/10)))
+    #         # limit things to the map region
+    #         if X > 799:
+    #             X = 799
+    #         if Y > 799:
+    #             Y = 799
+    #         elif Y < 0:
+    #             Y = 0
 
-            pixVal = self.occupancyMap[Y,X]
+    #         pixVal = self.occupancyMap[Y,X]
 
-            if searchingForFreeSpace == True:
-                if pixVal == 1:
-                    stepSize *= -.5
-                    searchingForFreeSpace = False
-            else:
-                if pixVal == 0:
-                    stepSize *= -.5
-                    searchingForFreeSpace = True
+    #         if searchingForFreeSpace == True:
+    #             if pixVal == 1:
+    #                 stepSize *= -.5
+    #                 searchingForFreeSpace = False
+    #         else:
+    #             if pixVal == 0:
+    #                 stepSize *= -.5
+    #                 searchingForFreeSpace = True
 
-        #print("Finished")
+    #     #print("Finished")
 
-        return currentDistance
-
-
+    #     return currentDistance
 
 
 
@@ -166,55 +181,57 @@ class SensorModel:
 
 
 
-    def findMeasurement2(self,globalAngleForBeam, particleLocation):
-        # This is a different version of the find measurement function
-        # The way that it works is to do a binary search where it repeatedly
-        # * finds a point 50% along the range that it is corrently examining
-        # * If that point is occupied, it makes that the new maxDistance
-        # * if that point is free space, it makes that the new minDistance
-        # It stops when the distance between min and max is equal to 1 and 
-        # it then returns the maxDistance
-        # For 10000 particles with angle increment of 5, this takes 6.5 to 7.2 seconds
-        maxDistance = 1000 # centimeters
-        minDistance = 0
+
+
+    # def findMeasurement2(self,globalAngleForBeam, particleLocation):
+    #     # This is a different version of the find measurement function
+    #     # The way that it works is to do a binary search where it repeatedly
+    #     # * finds a point 50% along the range that it is corrently examining
+    #     # * If that point is occupied, it makes that the new maxDistance
+    #     # * if that point is free space, it makes that the new minDistance
+    #     # It stops when the distance between min and max is equal to 1 and 
+    #     # it then returns the maxDistance
+    #     # For 10000 particles with angle increment of 5, this takes 6.5 to 7.2 seconds
+    #     maxDistance = self.maxDistance  # centimeters
+    #     minDistance = 0
         
 
-        particleLocationX = int(round(particleLocation[0]/10)) # convert to decimeters
-        particleLocationY = int(round(particleLocation[1]/10))
+    #     particleLocationX = int(round(particleLocation[0]/10)) # convert to decimeters
+    #     particleLocationY = int(round(particleLocation[1]/10))
 
 
-        stillWorking = True
+    #     stillWorking = True
 
-        sinOfGlobalAngle = math.sin(globalAngleForBeam)
-        cosOfGlobalAngle = math.cos(globalAngleForBeam)
+    #     sinOfGlobalAngle = math.sin(globalAngleForBeam)
+    #     cosOfGlobalAngle = math.cos(globalAngleForBeam)
 
-        while stillWorking == True:
-            distanceRange = maxDistance - minDistance
-            print ("Distance range: %f\tMax: %d\tMin: %d" % (distanceRange,maxDistance,minDistance))
-            if distanceRange == 1:
-                stillWorking = False
-            else:
-                # split the working range into two while keeping it an integer
-                midDistance = int(((maxDistance-minDistance)*.5)) + minDistance
-                #Find the pixel coordinates for that distance
-                midX = round((particleLocationX + (midDistance * cosOfGlobalAngle)/10))
-                midY = round((particleLocationY + (midDistance * sinOfGlobalAngle)/10))
+    #     while stillWorking == True:
+    #         distanceRange = maxDistance - minDistance
+    #         print ("Distance range: %f\tMax: %d\tMin: %d" % (distanceRange,maxDistance,minDistance))
+    #         if distanceRange == 1:
+    #             stillWorking = False
+    #         else:
+    #             # split the working range into two while keeping it an integer
+    #             midDistance = int(((maxDistance-minDistance)*.5)) + minDistance
+    #             #Find the pixel coordinates for that distance
+    #             midX = round((particleLocationX + (midDistance * cosOfGlobalAngle)/10))
+    #             midY = round((particleLocationY + (midDistance * sinOfGlobalAngle)/10))
 
-                # limit things to the map region
-                if midX > 799:
-                    midX = 799
-                if midY > 799:
-                    midY = 799
-                elif midY < 0:
-                    midY = 0
+    #             # limit things to the map region
+    #             if midX > 799:
+    #                 midX = 799
+    #             if midY > 799:
+    #                 midY = 799
+    #             elif midY < 0:
+    #                 midY = 0
 
                 
-                if self.occupancyMap[midY,midX] == 0: # occupied
-                    maxDistance = midDistance
-                else:
-                    minDistance = midDistance
+    #             if self.occupancyMap[midY,midX] == 0: # occupied
+    #                 maxDistance = midDistance
+    #             else:
+    #                 minDistance = midDistance
 
-        return maxDistance
+    #     return maxDistance
 
 
 
@@ -229,7 +246,7 @@ class SensorModel:
         # particleLocation is in centimeters
         # For 10000 particles with angle increment of 5, this takes 8 to 9.2 seconds
 
-        maxDistance = 1000 # centimeters
+        #maxDistance = 1000 # centimeters
 
         particleLocationX = int(round(particleLocation[0]/10)) # convert to decimeters
         particleLocationY = int(round(particleLocation[1]/10))
@@ -237,8 +254,8 @@ class SensorModel:
 
         
         # This is an integer version of Bresenham's line drawing algorithm
-        xSteps = int(maxDistance * math.cos(globalAngleForBeam))
-        ySteps = int(maxDistance * math.sin(globalAngleForBeam))
+        xSteps = int(self.maxDistance  * math.cos(globalAngleForBeam))
+        ySteps = int(self.maxDistance  * math.sin(globalAngleForBeam))
 
         absXsteps = abs(xSteps)
         absYsteps = abs(ySteps)
@@ -301,8 +318,8 @@ class SensorModel:
                     X += xStep
 
         distance *= 10
-        if distance >= 1000:
-            distance = 999  # To prevent issues with the lookup table
+        if distance >= self.maxDistance :
+            distance = self.maxDistance -1  # To prevent issues with the lookup table
 
         #print("Angle: %f\t distance: %f\t%d\t%d" % (globalAngleForBeam,distance,xSteps,ySteps))
         return distance  
@@ -313,7 +330,10 @@ class SensorModel:
 
     def calculateProbability(self,actualMeasurement, particleMeasurement):
         # Calculates the probability that the particle is in the right place given the two measurements
-  
+        
+        if actualMeasurement > self.maxDistance :
+            actualMeasurement = self.maxDistance 
+
         probability = self.uniformValue;
         if actualMeasurement <= particleMeasurement:
             probability += self.expPDF[0][int(actualMeasurement)]
@@ -355,7 +375,7 @@ class SensorModel:
 
         ############################## KNOBS TO TURN #########################################
 
-        angleIncrement = 4; # The number of degrees to move when doing calculations.
+        angleIncrement = 8; # The number of degrees to move when doing calculations.
                             # 1 results in calculating every angle.
                             # 2 results in calculating every other angle.
 
@@ -402,13 +422,13 @@ class SensorModel:
             particleMeasurement = self.findMeasurement(absoluteAngle, particleLocation) # Returns the measurement in cm
 
             #print (particleMeasurement)
-            # # ######################### FOR TESTING ONLY - Laser lines ############################                   ############ REMOVE AFTER TESTING
-            # X = particleMeasurement * math.cos(absoluteAngle) + particleX  # This value is in centimeters
-            # Y = particleMeasurement * math.sin(absoluteAngle) + particleY
-            # self.rangeLines[I][:] = [particleX/10,particleY/10,X/10,Y/10] # all of the /10 are so it displays correctly on the map
+            # ######################### FOR TESTING ONLY - Laser lines ############################                   ############ REMOVE AFTER TESTING
+            X = particleMeasurement * math.cos(absoluteAngle) + particleX  # This value is in centimeters
+            Y = particleMeasurement * math.sin(absoluteAngle) + particleY
+            self.rangeLines[I][:] = [particleX/10,particleY/10,X/10,Y/10] # all of the /10 are so it displays correctly on the map
             
-            # self.ranges[I] = int(particleMeasurement)
-            # # ######################### FOR TESTING ONLY ############################                   ############ REMOVE AFTER TESTING
+            self.ranges[I] = int(particleMeasurement)
+            # ######################### FOR TESTING ONLY ############################                   ############ REMOVE AFTER TESTING
 
 
 

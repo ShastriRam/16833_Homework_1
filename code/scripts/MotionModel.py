@@ -12,10 +12,15 @@ class MotionModel:
     def __init__(self):
 
         #Initialize Motion Model parameters here
+        # self.alpha_1 = 0.00003; #rotation        
+        # self.alpha_2 = 0.00001; #translation
+        # self.alpha_3 = 0.00001; #translation
+        # self.alpha_4 = 0.00003; #rotation
+
         self.alpha_1 = 0.0003; #rotation        
         self.alpha_2 = 0.0001; #translation
-        self.alpha_3 = 0.0001; #translation
-        self.alpha_4 = 0.0003; #rotation
+        self.alpha_3 = 0.0003; #translation
+        self.alpha_4 = 0.0001; #rotation
 
     def sample_normal(self, b_sq):
         b = math.sqrt(b_sq);
@@ -70,7 +75,7 @@ class MotionModel:
         x_prime = pose_x + delta_trans_prime*math.cos(pose_theta+delta_rot_1_prime);
 
         y_prime = pose_y + delta_trans_prime*math.sin(pose_theta+delta_rot_1_prime);
-        
+
         theta_prime = pose_theta + delta_rot_1_prime + delta_rot_2_prime;
 
         x_t1 = np.array([x_prime, y_prime, theta_prime]);  
