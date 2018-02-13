@@ -126,9 +126,9 @@ def main():
     ###########################################  SET THE NUMBER OF PARTICLES #####################################
 
     src_path_map = '../data/map/wean.dat'
-    #src_path_log = '../data/log/robotdata1.log'
+    src_path_log = '../data/log/robotdata1.log'
 
-    src_path_log = '../data/log/robotdata5.log'
+    #src_path_log = '../data/log/robotdata5.log'
 
     map_obj = MapReader(src_path_map)
     occupancy_map = map_obj.get_map()
@@ -243,13 +243,13 @@ def main():
 
         
         # #normalize the weights
-        # minWeight = min(particles[:,3]);
-        # maxWeight = max(particles[:,3]);
-        # weightRng = (maxWeight - minWeight);
-        # if (abs(weightRng)<0.0000001):
-        #     particles[:,3] = (1/float(num_particles))*np.ones(num_particles);
-        # else:
-        #     particles[:,3] = (particles[:,3] - minWeight)/weightRng;
+        #minWeight = min(particles[:,3]);
+        #maxWeight = max(particles[:,3]);
+        #weightRng = (maxWeight - minWeight);
+        #if (abs(weightRng)<0.0000001):
+        #    particles[:,3] = (1/float(num_particles))*np.ones(num_particles);
+        #else:
+        #    particles[:,3] = (particles[:,3] - minWeight)/weightRng;
         
         
         #print '***********Particles after normalizing***************'
